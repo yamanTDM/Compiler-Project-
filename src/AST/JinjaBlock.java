@@ -5,16 +5,16 @@ import java.util.List;
 
 public class JinjaBlock extends JinjaNode{
     private final JinjaSuperBlock superBlock;
-    private final JinjaText name;
+    private final JinjaId name;
     private final List<BodyNode> bodies;
 
-    public JinjaBlock(int line, JinjaText name,JinjaSuperBlock superBlock) {
+    public JinjaBlock(int line, JinjaId name,JinjaSuperBlock superBlock) {
         super(line, "Jinja Block");
         this.name = name;
         this.bodies = new ArrayList<>() ;
         this.superBlock = superBlock;
     }
-    public JinjaBlock(int line, JinjaText name) {
+    public JinjaBlock(int line, JinjaId name) {
         super(line, "Jinja Block");
         this.name = name;
         this.bodies = new ArrayList<>();
@@ -26,7 +26,7 @@ public class JinjaBlock extends JinjaNode{
     public void removeBody(BodyNode body) {
         this.bodies.remove(body);
     }
-    public JinjaText getName() {
+    public JinjaId getName() {
         return name;
     }
     public List<BodyNode> getBodys() {
@@ -39,7 +39,7 @@ public class JinjaBlock extends JinjaNode{
     @Override
     public String print(String indent) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(indent).append(super.toString()).append(" name: ").append(name.getText()).append("{\n");
+        stringBuilder.append(indent).append(super.toString()).append(" name: ").append(name.getFullName()).append("{\n");
         if (superBlock != null) {
             stringBuilder.append(indent).append("super()").append("\n");
         }

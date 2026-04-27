@@ -502,26 +502,12 @@ public interface JinjaHtmlParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitJinjaExpr(JinjaHtmlParser.JinjaExprContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code JinjaExpressionIDBody}
-	 * labeled alternative in {@link JinjaHtmlParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitJinjaExpressionIDBody(JinjaHtmlParser.JinjaExpressionIDBodyContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code JinjaExpressionFunction}
 	 * labeled alternative in {@link JinjaHtmlParser#expr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitJinjaExpressionFunction(JinjaHtmlParser.JinjaExpressionFunctionContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code JinjaExpressionText}
-	 * labeled alternative in {@link JinjaHtmlParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitJinjaExpressionText(JinjaHtmlParser.JinjaExpressionTextContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code JinjaExpressionCombine}
 	 * labeled alternative in {@link JinjaHtmlParser#expr}.
@@ -536,6 +522,27 @@ public interface JinjaHtmlParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitJinjaExpressionAssign(JinjaHtmlParser.JinjaExpressionAssignContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code JinjaExpressionStringBody}
+	 * labeled alternative in {@link JinjaHtmlParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitJinjaExpressionStringBody(JinjaHtmlParser.JinjaExpressionStringBodyContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code JinjaExpressionIDBody}
+	 * labeled alternative in {@link JinjaHtmlParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitJinjaExpressionIDBody(JinjaHtmlParser.JinjaExpressionIDBodyContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code JinjaExpressionText}
+	 * labeled alternative in {@link JinjaHtmlParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitJinjaExpressionText(JinjaHtmlParser.JinjaExpressionTextContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link JinjaHtmlParser#combineHalf}.
 	 * @param ctx the parse tree

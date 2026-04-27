@@ -71,7 +71,7 @@ JINJA_ENDFOR   : 'endfor';
 JINJA_IF       : 'if';
 JINJA_ELIF     : 'elif';
 JINJA_ELSE     : 'else';
-JINJA_ENDIF   : 'endif';
+JINJA_ENDIF    : 'endif';
 
 JINJA_INS      : 'in' | 'not in';
 JINJA_COMPARE : '==' | '!=' | '<' | '>' | '<=' | '>=' | 'is';

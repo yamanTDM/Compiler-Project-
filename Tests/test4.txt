@@ -1,15 +1,33 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{ product.name }}</h1>
 
-<img src="{{ url_for('static', filename='uploads/' ~ product.image) }}"alt="details.img"
-height="400px" width="400px">
+{% if product %}
+<div class="detail-wrapper">
 
+    <div class="detail-card">
+        <!-- IMAGE -->
+        <div class="detail-image">
+            <img src="{{ url_for('static', filename='uploads/' ~ product.image) }}">
+        </div>
 
-<p><strong>Price:</strong> ${{ product.price }}</p>
+        <!-- INFO -->
+        <div class="detail-info">
+            <h1>{{ product.name }}</h1>
 
-<p><strong>Details:</strong> {{ product.details }}</p>
+            <p class="price">€{{ product.price }}</p>
 
-<a class="btn" href="{{ url_for('index') }}">Back to Products</a>
+            <p class="description">
+                {{ product.description }}
+            </p>
+
+            <a href="{{ url_for('index') }}" class="back-btn">← Back</a>
+        </div>
+    </div>
+
+</div>
+{% else %}
+<p>Product not found</p>
+{% endif %}
+
 {% endblock %}

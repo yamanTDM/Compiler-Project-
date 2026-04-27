@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JinjaFunction extends JinjaExpr {
-    private final JinjaText name;
+    private final JinjaId name;
     private final List<JinjaExpr> arguments;
-    public JinjaFunction(int line,JinjaText name) {
+    public JinjaFunction(int line,JinjaId name) {
         super(line,"Jinja Function");
         this.name = name;
         this.arguments = new ArrayList<>();
@@ -18,7 +18,7 @@ public class JinjaFunction extends JinjaExpr {
         this.arguments.remove(argument);
     }
 
-    public JinjaText getName() {
+    public JinjaId getName() {
         return name;
     }
 
@@ -30,7 +30,7 @@ public class JinjaFunction extends JinjaExpr {
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(super.name).append("- ");
-        stringBuilder.append(name.getText()).append("(");
+        stringBuilder.append(name.getFullName()).append("(");
         for (JinjaExpr argument : arguments) {
             stringBuilder.append(argument.toString());
         }

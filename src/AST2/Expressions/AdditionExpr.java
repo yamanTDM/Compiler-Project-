@@ -1,7 +1,6 @@
 package AST2.Expressions;
 
 import AST2.Expr;
-import Visitor.PythonVisitor;
 
 public class AdditionExpr extends Expr{
     private final Expr left;

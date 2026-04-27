@@ -1,13 +1,13 @@
 package AST;
 
 public class JinjaFor extends JinjaNode{
-    private final JinjaText itemName;
-    private final JinjaText collectionName;
+    private final JinjaId itemName;
+    private final JinjaId collectionName;
     private final Condition filterCondition;
     private final BodyNode body;
     private final BodyNode elseBody;
 
-    public JinjaFor(int line, JinjaText itemName, JinjaText collectionName,
+    public JinjaFor(int line, JinjaId itemName, JinjaId collectionName,
                         Condition filterCondition, BodyNode body, BodyNode elseBody) {
         super(line, "Jinja For Loop");
         this.itemName = itemName;
@@ -17,8 +17,8 @@ public class JinjaFor extends JinjaNode{
         this.elseBody = elseBody;
     }
 
-    public JinjaText getItemName() { return itemName; }
-    public JinjaText getCollectionName() { return collectionName; }
+    public JinjaId getItemName() { return itemName; }
+    public JinjaId getCollectionName() { return collectionName; }
     public Condition getFilterCondition() { return filterCondition; }
     public BodyNode getBody() { return body; }
     public BodyNode getElseBody() { return elseBody; }
@@ -27,7 +27,7 @@ public class JinjaFor extends JinjaNode{
     public String print(String indent) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(indent).append(super.toString()).append("{\n");
-        stringBuilder.append(indent).append("loop: ").append(itemName.getText()).append(" in ").append(collectionName.getText()).append("\n");
+        stringBuilder.append(indent).append("loop: ").append(itemName.getFullName()).append(" in ").append(collectionName.getFullName()).append("\n");
         if(filterCondition != null) {
             stringBuilder.append(indent).append("Condition: ").append(filterCondition).append("\n");
         }

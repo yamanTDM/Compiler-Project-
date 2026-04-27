@@ -4083,6 +4083,24 @@ public class JinjaHtmlParser extends Parser {
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
+	public static class JinjaExpressionStringBodyContext extends ExprContext {
+		public TerminalNode JINJA_STRING_EXPR() { return getToken(JinjaHtmlParser.JINJA_STRING_EXPR, 0); }
+		public JinjaExpressionStringBodyContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof JinjaHtmlParserListener ) ((JinjaHtmlParserListener)listener).enterJinjaExpressionStringBody(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof JinjaHtmlParserListener ) ((JinjaHtmlParserListener)listener).exitJinjaExpressionStringBody(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof JinjaHtmlParserVisitor ) return ((JinjaHtmlParserVisitor<? extends T>)visitor).visitJinjaExpressionStringBody(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	@SuppressWarnings("CheckReturnValue")
 	public static class JinjaExpressionFunctionContext extends ExprContext {
 		public FunctionCallContext functionCall() {
 			return getRuleContext(FunctionCallContext.class,0);
@@ -4183,63 +4201,71 @@ public class JinjaHtmlParser extends Parser {
 			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,44,_ctx) ) {
 			case 1:
-				_localctx = new JinjaExpressionIDBodyContext(_localctx);
+				_localctx = new JinjaExpressionFunctionContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(473);
-				jinjaId();
-				}
-				break;
-			case 2:
-				_localctx = new JinjaExpressionFunctionContext(_localctx);
-				enterOuterAlt(_localctx, 2);
-				{
-				setState(474);
 				functionCall();
 				}
 				break;
-			case 3:
-				_localctx = new JinjaExpressionTextContext(_localctx);
-				enterOuterAlt(_localctx, 3);
-				{
-				setState(475);
-				match(JINJA_TEXT);
-				}
-				break;
-			case 4:
+			case 2:
 				_localctx = new JinjaExpressionCombineContext(_localctx);
-				enterOuterAlt(_localctx, 4);
+				enterOuterAlt(_localctx, 2);
 				{
-				setState(476);
+				setState(474);
 				combineHalf();
-				setState(481);
+				setState(477); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				while (_la==JINJA_COMBINE) {
+				do {
 					{
 					{
-					setState(477);
+					setState(475);
 					match(JINJA_COMBINE);
-					setState(478);
+					setState(476);
 					combineHalf();
 					}
 					}
-					setState(483);
+					setState(479); 
 					_errHandler.sync(this);
 					_la = _input.LA(1);
+				} while ( _la==JINJA_COMBINE );
 				}
+				break;
+			case 3:
+				_localctx = new JinjaExpressionAssignContext(_localctx);
+				enterOuterAlt(_localctx, 3);
+				{
+				setState(481);
+				jinjaId();
+				setState(482);
+				match(JINJA_EQUAL);
+				setState(483);
+				expr();
+				}
+				break;
+			case 4:
+				_localctx = new JinjaExpressionStringBodyContext(_localctx);
+				enterOuterAlt(_localctx, 4);
+				{
+				setState(485);
+				match(JINJA_STRING_EXPR);
 				}
 				break;
 			case 5:
-				_localctx = new JinjaExpressionAssignContext(_localctx);
+				_localctx = new JinjaExpressionIDBodyContext(_localctx);
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(484);
-				jinjaId();
-				setState(485);
-				match(JINJA_EQUAL);
 				setState(486);
-				expr();
+				jinjaId();
+				}
+				break;
+			case 6:
+				_localctx = new JinjaExpressionTextContext(_localctx);
+				enterOuterAlt(_localctx, 6);
+				{
+				setState(487);
+				match(JINJA_TEXT);
 				}
 				break;
 			}
@@ -4627,14 +4653,14 @@ public class JinjaHtmlParser extends Parser {
 		"\u0001\'\u0001(\u0001(\u0001(\u0003(\u01c3\b(\u0001)\u0001)\u0001)\u0003"+
 		")\u01c8\b)\u0001)\u0001)\u0001)\u0003)\u01cd\b)\u0003)\u01cf\b)\u0001"+
 		"*\u0001*\u0005*\u01d3\b*\n*\f*\u01d6\t*\u0001*\u0001*\u0001+\u0001+\u0001"+
-		"+\u0001+\u0001+\u0001+\u0005+\u01e0\b+\n+\f+\u01e3\t+\u0001+\u0001+\u0001"+
-		"+\u0001+\u0003+\u01e9\b+\u0001,\u0001,\u0003,\u01ed\b,\u0001-\u0001-\u0001"+
-		"-\u0001-\u0001-\u0005-\u01f4\b-\n-\f-\u01f7\t-\u0003-\u01f9\b-\u0001-"+
-		"\u0001-\u0001.\u0001.\u0005.\u01ff\b.\n.\f.\u0202\t.\u0001.\u0001.\u0001"+
-		"/\u0001/\u0001/\u0003/\u0209\b/\u0001/\u0000\u0001F0\u0000\u0002\u0004"+
-		"\u0006\b\n\f\u000e\u0010\u0012\u0014\u0016\u0018\u001a\u001c\u001e \""+
-		"$&(*,.02468:<>@BDFHJLNPRTVXZ\\^\u0000\u0004\u0002\u0000KKXX\u0002\u0000"+
-		"WW[\\\u0001\u0000$%\u0003\u0000\u0002\u0002;;??\u0227\u0000c\u0001\u0000"+
+		"+\u0001+\u0004+\u01de\b+\u000b+\f+\u01df\u0001+\u0001+\u0001+\u0001+\u0001"+
+		"+\u0001+\u0001+\u0003+\u01e9\b+\u0001,\u0001,\u0003,\u01ed\b,\u0001-\u0001"+
+		"-\u0001-\u0001-\u0001-\u0005-\u01f4\b-\n-\f-\u01f7\t-\u0003-\u01f9\b-"+
+		"\u0001-\u0001-\u0001.\u0001.\u0005.\u01ff\b.\n.\f.\u0202\t.\u0001.\u0001"+
+		".\u0001/\u0001/\u0001/\u0003/\u0209\b/\u0001/\u0000\u0001F0\u0000\u0002"+
+		"\u0004\u0006\b\n\f\u000e\u0010\u0012\u0014\u0016\u0018\u001a\u001c\u001e"+
+		" \"$&(*,.02468:<>@BDFHJLNPRTVXZ\\^\u0000\u0004\u0002\u0000KKXX\u0002\u0000"+
+		"WW[\\\u0001\u0000$%\u0003\u0000\u0002\u0002;;??\u0228\u0000c\u0001\u0000"+
 		"\u0000\u0000\u0002i\u0001\u0000\u0000\u0000\u0004\u0083\u0001\u0000\u0000"+
 		"\u0000\u0006\u0085\u0001\u0000\u0000\u0000\b\u008f\u0001\u0000\u0000\u0000"+
 		"\n\u0093\u0001\u0000\u0000\u0000\f\u009e\u0001\u0000\u0000\u0000\u000e"+
@@ -4858,39 +4884,39 @@ public class JinjaHtmlParser extends Parser {
 		"\u0000\u01d3\u01d6\u0001\u0000\u0000\u0000\u01d4\u01d2\u0001\u0000\u0000"+
 		"\u0000\u01d4\u01d5\u0001\u0000\u0000\u0000\u01d5\u01d7\u0001\u0000\u0000"+
 		"\u0000\u01d6\u01d4\u0001\u0000\u0000\u0000\u01d7\u01d8\u0005\n\u0000\u0000"+
-		"\u01d8U\u0001\u0000\u0000\u0000\u01d9\u01e9\u0003R)\u0000\u01da\u01e9"+
-		"\u0003Z-\u0000\u01db\u01e9\u0005\u0014\u0000\u0000\u01dc\u01e1\u0003X"+
-		",\u0000\u01dd\u01de\u0005\u0010\u0000\u0000\u01de\u01e0\u0003X,\u0000"+
-		"\u01df\u01dd\u0001\u0000\u0000\u0000\u01e0\u01e3\u0001\u0000\u0000\u0000"+
-		"\u01e1\u01df\u0001\u0000\u0000\u0000\u01e1\u01e2\u0001\u0000\u0000\u0000"+
-		"\u01e2\u01e9\u0001\u0000\u0000\u0000\u01e3\u01e1\u0001\u0000\u0000\u0000"+
-		"\u01e4\u01e5\u0003R)\u0000\u01e5\u01e6\u0005\u000f\u0000\u0000\u01e6\u01e7"+
-		"\u0003V+\u0000\u01e7\u01e9\u0001\u0000\u0000\u0000\u01e8\u01d9\u0001\u0000"+
-		"\u0000\u0000\u01e8\u01da\u0001\u0000\u0000\u0000\u01e8\u01db\u0001\u0000"+
-		"\u0000\u0000\u01e8\u01dc\u0001\u0000\u0000\u0000\u01e8\u01e4\u0001\u0000"+
-		"\u0000\u0000\u01e9W\u0001\u0000\u0000\u0000\u01ea\u01ed\u0005\u0012\u0000"+
-		"\u0000\u01eb\u01ed\u0003R)\u0000\u01ec\u01ea\u0001\u0000\u0000\u0000\u01ec"+
-		"\u01eb\u0001\u0000\u0000\u0000\u01edY\u0001\u0000\u0000\u0000\u01ee\u01ef"+
-		"\u0003R)\u0000\u01ef\u01f8\u0005\u000b\u0000\u0000\u01f0\u01f5\u0003V"+
-		"+\u0000\u01f1\u01f2\u0005\r\u0000\u0000\u01f2\u01f4\u0003V+\u0000\u01f3"+
-		"\u01f1\u0001\u0000\u0000\u0000\u01f4\u01f7\u0001\u0000\u0000\u0000\u01f5"+
-		"\u01f3\u0001\u0000\u0000\u0000\u01f5\u01f6\u0001\u0000\u0000\u0000\u01f6"+
-		"\u01f9\u0001\u0000\u0000\u0000\u01f7\u01f5\u0001\u0000\u0000\u0000\u01f8"+
-		"\u01f0\u0001\u0000\u0000\u0000\u01f8\u01f9\u0001\u0000\u0000\u0000\u01f9"+
-		"\u01fa\u0001\u0000\u0000\u0000\u01fa\u01fb\u0005\f\u0000\u0000\u01fb["+
-		"\u0001\u0000\u0000\u0000\u01fc\u0200\u0005\u0003\u0000\u0000\u01fd\u01ff"+
-		"\u0003^/\u0000\u01fe\u01fd\u0001\u0000\u0000\u0000\u01ff\u0202\u0001\u0000"+
-		"\u0000\u0000\u0200\u01fe\u0001\u0000\u0000\u0000\u0200\u0201\u0001\u0000"+
-		"\u0000\u0000\u0201\u0203\u0001\u0000\u0000\u0000\u0202\u0200\u0001\u0000"+
-		"\u0000\u0000\u0203\u0204\u0005\u0015\u0000\u0000\u0204]\u0001\u0000\u0000"+
-		"\u0000\u0205\u0209\u0005,\u0000\u0000\u0206\u0209\u0003R)\u0000\u0207"+
-		"\u0209\u0005*\u0000\u0000\u0208\u0205\u0001\u0000\u0000\u0000\u0208\u0206"+
-		"\u0001\u0000\u0000\u0000\u0208\u0207\u0001\u0000\u0000\u0000\u0209_\u0001"+
-		"\u0000\u0000\u00002ciq\u0083\u008a\u0098\u009e\u00a3\u00a7\u00b2\u00b8"+
-		"\u00be\u00ce\u00d8\u00dd\u00e6\u00eb\u00f2\u00f9\u00fe\u0102\u0108\u0121"+
-		"\u0125\u013a\u014d\u0153\u0159\u016f\u0173\u017c\u0183\u0189\u019b\u01a2"+
-		"\u01a9\u01ac\u01b7\u01c2\u01c7\u01cc\u01ce\u01d4\u01e1\u01e8\u01ec\u01f5"+
-		"\u01f8\u0200\u0208";
+		"\u01d8U\u0001\u0000\u0000\u0000\u01d9\u01e9\u0003Z-\u0000\u01da\u01dd"+
+		"\u0003X,\u0000\u01db\u01dc\u0005\u0010\u0000\u0000\u01dc\u01de\u0003X"+
+		",\u0000\u01dd\u01db\u0001\u0000\u0000\u0000\u01de\u01df\u0001\u0000\u0000"+
+		"\u0000\u01df\u01dd\u0001\u0000\u0000\u0000\u01df\u01e0\u0001\u0000\u0000"+
+		"\u0000\u01e0\u01e9\u0001\u0000\u0000\u0000\u01e1\u01e2\u0003R)\u0000\u01e2"+
+		"\u01e3\u0005\u000f\u0000\u0000\u01e3\u01e4\u0003V+\u0000\u01e4\u01e9\u0001"+
+		"\u0000\u0000\u0000\u01e5\u01e9\u0005\u0012\u0000\u0000\u01e6\u01e9\u0003"+
+		"R)\u0000\u01e7\u01e9\u0005\u0014\u0000\u0000\u01e8\u01d9\u0001\u0000\u0000"+
+		"\u0000\u01e8\u01da\u0001\u0000\u0000\u0000\u01e8\u01e1\u0001\u0000\u0000"+
+		"\u0000\u01e8\u01e5\u0001\u0000\u0000\u0000\u01e8\u01e6\u0001\u0000\u0000"+
+		"\u0000\u01e8\u01e7\u0001\u0000\u0000\u0000\u01e9W\u0001\u0000\u0000\u0000"+
+		"\u01ea\u01ed\u0005\u0012\u0000\u0000\u01eb\u01ed\u0003R)\u0000\u01ec\u01ea"+
+		"\u0001\u0000\u0000\u0000\u01ec\u01eb\u0001\u0000\u0000\u0000\u01edY\u0001"+
+		"\u0000\u0000\u0000\u01ee\u01ef\u0003R)\u0000\u01ef\u01f8\u0005\u000b\u0000"+
+		"\u0000\u01f0\u01f5\u0003V+\u0000\u01f1\u01f2\u0005\r\u0000\u0000\u01f2"+
+		"\u01f4\u0003V+\u0000\u01f3\u01f1\u0001\u0000\u0000\u0000\u01f4\u01f7\u0001"+
+		"\u0000\u0000\u0000\u01f5\u01f3\u0001\u0000\u0000\u0000\u01f5\u01f6\u0001"+
+		"\u0000\u0000\u0000\u01f6\u01f9\u0001\u0000\u0000\u0000\u01f7\u01f5\u0001"+
+		"\u0000\u0000\u0000\u01f8\u01f0\u0001\u0000\u0000\u0000\u01f8\u01f9\u0001"+
+		"\u0000\u0000\u0000\u01f9\u01fa\u0001\u0000\u0000\u0000\u01fa\u01fb\u0005"+
+		"\f\u0000\u0000\u01fb[\u0001\u0000\u0000\u0000\u01fc\u0200\u0005\u0003"+
+		"\u0000\u0000\u01fd\u01ff\u0003^/\u0000\u01fe\u01fd\u0001\u0000\u0000\u0000"+
+		"\u01ff\u0202\u0001\u0000\u0000\u0000\u0200\u01fe\u0001\u0000\u0000\u0000"+
+		"\u0200\u0201\u0001\u0000\u0000\u0000\u0201\u0203\u0001\u0000\u0000\u0000"+
+		"\u0202\u0200\u0001\u0000\u0000\u0000\u0203\u0204\u0005\u0015\u0000\u0000"+
+		"\u0204]\u0001\u0000\u0000\u0000\u0205\u0209\u0005,\u0000\u0000\u0206\u0209"+
+		"\u0003R)\u0000\u0207\u0209\u0005*\u0000\u0000\u0208\u0205\u0001\u0000"+
+		"\u0000\u0000\u0208\u0206\u0001\u0000\u0000\u0000\u0208\u0207\u0001\u0000"+
+		"\u0000\u0000\u0209_\u0001\u0000\u0000\u00002ciq\u0083\u008a\u0098\u009e"+
+		"\u00a3\u00a7\u00b2\u00b8\u00be\u00ce\u00d8\u00dd\u00e6\u00eb\u00f2\u00f9"+
+		"\u00fe\u0102\u0108\u0121\u0125\u013a\u014d\u0153\u0159\u016f\u0173\u017c"+
+		"\u0183\u0189\u019b\u01a2\u01a9\u01ac\u01b7\u01c2\u01c7\u01cc\u01ce\u01d4"+
+		"\u01df\u01e8\u01ec\u01f5\u01f8\u0200\u0208";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

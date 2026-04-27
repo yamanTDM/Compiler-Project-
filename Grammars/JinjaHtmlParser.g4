@@ -141,12 +141,13 @@ jinjaExpr
 ;
 
 expr
-: jinjaId                                                                                   #JinjaExpressionIDBody
-| functionCall                                                                              #JinjaExpressionFunction
-| JINJA_TEXT                                                                                #JinjaExpressionText
-| combineHalf (JINJA_COMBINE combineHalf)*                                                  #JinjaExpressionCombine
-| jinjaId JINJA_EQUAL expr                                                                  #JinjaExpressionAssign
-;
+    : functionCall                                              #JinjaExpressionFunction
+    | combineHalf (JINJA_COMBINE combineHalf)+                 #JinjaExpressionCombine
+    | jinjaId JINJA_EQUAL expr                                 #JinjaExpressionAssign
+    | JINJA_STRING_EXPR                                         #JinjaExpressionStringBody
+    | jinjaId                                                  #JinjaExpressionIDBody
+    | JINJA_TEXT                                               #JinjaExpressionText
+    ;
 
 combineHalf: (JINJA_STRING_EXPR | jinjaId);
 

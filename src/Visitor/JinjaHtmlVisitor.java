@@ -406,7 +406,7 @@ public class JinjaHtmlVisitor extends JinjaHtmlParserBaseVisitor{
         int line = ctx.start.getLine();
         JinjaBlock block;
 
-        JinjaText name = (JinjaText) visit(ctx.jinjaBlockStart().jinjaId());
+        JinjaId name = (JinjaId) visit(ctx.jinjaBlockStart().jinjaId());
         if (ctx.jinjaSuperBlock() != null) {
             JinjaSuperBlock superBlock = new JinjaSuperBlock(line);
              block = new JinjaBlock(line, name, superBlock);
@@ -503,8 +503,8 @@ public class JinjaHtmlVisitor extends JinjaHtmlParserBaseVisitor{
     @Override
     public JinjaFor visitJinjaForLoop(JinjaHtmlParser.JinjaForLoopContext ctx) {
         int line = ctx.start.getLine();
-        JinjaText itemName =(JinjaText) visit(ctx.jinjaFor().jinjaId().getFirst());
-        JinjaText collectionName =(JinjaText) visit(ctx.jinjaFor().jinjaId().getLast());
+        JinjaId itemName =(JinjaId) visit(ctx.jinjaFor().jinjaId().getFirst());
+        JinjaId collectionName =(JinjaId) visit(ctx.jinjaFor().jinjaId().get(1));
         Condition condition = null;
         if(ctx.jinjaFor().jinjaConditions() != null) {
             condition = (Condition) visit(ctx.jinjaFor().jinjaConditions());
@@ -524,45 +524,48 @@ public class JinjaHtmlVisitor extends JinjaHtmlParserBaseVisitor{
     }
 
     @Override
-    public JinjaText visitJinjaExpressionID(JinjaHtmlParser.JinjaExpressionIDContext ctx) {
+    public JinjaId visitJinjaExpressionID(JinjaHtmlParser.JinjaExpressionIDContext ctx) {
         int line = ctx.start.getLine();
 
-        StringBuilder stringBuilder = new StringBuilder();
+        JinjaId jinjaId = new JinjaId(line);
+
         for (int i = 0; i <ctx.JINJA_ID_EXPR().size();i++) {
-            stringBuilder.append(ctx.JINJA_ID_EXPR().get(i).getText());
-            if(i != ctx.JINJA_ID_EXPR().size() - 1) {
-                stringBuilder.append(".");
-            }
+            jinjaId.addPart(ctx.JINJA_ID_EXPR().get(i).getText());
+
         }
-        JinjaText text = new JinjaText(line,stringBuilder.toString());
-        return text;
+        return jinjaId;
     }
 
     @Override
-    public JinjaText visitJinjaStatementID(JinjaHtmlParser.JinjaStatementIDContext ctx) {
+    public JinjaId visitJinjaStatementID(JinjaHtmlParser.JinjaStatementIDContext ctx) {
+        int line = ctx.start.getLine();
+        JinjaId jinjaId = new JinjaId(line);
+        for (int i = 0; i < ctx.JINJA_ID_STMT().size(); i++) {
+            jinjaId.addPart(ctx.JINJA_ID_STMT().get(i).getText());
+
+        }
+        return jinjaId;
+    }
+
+
+    @Override
+    public JinjaId visitJinjaExpressionIDBody(JinjaHtmlParser.JinjaExpressionIDBodyContext ctx) {
+        return (JinjaId) visit(ctx.jinjaId());
+    }
+
+
+    @Override
+    public JinjaText visitJinjaExpressionStringBody(JinjaHtmlParser.JinjaExpressionStringBodyContext ctx) {
         int line = ctx.start.getLine();
 
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < ctx.JINJA_ID_STMT().size(); i++) {
-            stringBuilder.append(ctx.JINJA_ID_STMT().get(i).getText());
-            if (i != ctx.JINJA_ID_STMT().size() - 1) {
-                stringBuilder.append(".");
-            }
-        }
-        JinjaText text = new JinjaText(line, stringBuilder.toString());
-        return text;
+        return new JinjaText(line,ctx.JINJA_STRING_EXPR().getText());
     }
 
-
-    @Override
-    public JinjaText visitJinjaExpressionIDBody(JinjaHtmlParser.JinjaExpressionIDBodyContext ctx) {
-        return (JinjaText) visit(ctx.jinjaId());
-    }
 
     @Override
     public JinjaFunction visitJinjaExpressionFunction(JinjaHtmlParser.JinjaExpressionFunctionContext ctx) {
         int line = ctx.start.getLine();
-        JinjaFunction function = new JinjaFunction(line,(JinjaText) visit(ctx.functionCall().jinjaId()));
+        JinjaFunction function = new JinjaFunction(line,(JinjaId) visit(ctx.functionCall().jinjaId()));
         for (int i = 0;i < ctx.functionCall().expr().size();i++) {
             JinjaExpr expr = (JinjaExpr) visit(ctx.functionCall().expr().get(i));
             function.addArgument(expr);
@@ -581,26 +584,28 @@ public class JinjaHtmlVisitor extends JinjaHtmlParserBaseVisitor{
     }
 
     @Override
-    public JinjaText visitJinjaExpressionCombine(JinjaHtmlParser.JinjaExpressionCombineContext ctx) {
+    public JinjaCombine visitJinjaExpressionCombine(JinjaHtmlParser.JinjaExpressionCombineContext ctx) {
         int line = ctx.start.getLine();
-        StringBuilder builder = new StringBuilder();
+        JinjaCombine jinjaCombine = new JinjaCombine(line);
         for (int i = 0; i < ctx.combineHalf().size(); i++) {
             if(ctx.combineHalf().get(i).JINJA_STRING_EXPR() != null) {
-                builder.append(ctx.combineHalf().get(i).JINJA_STRING_EXPR().getText());
+                String text = ctx.combineHalf().get(i).JINJA_STRING_EXPR().getText();
+                text = text.substring(1, text.length() - 1);
+                jinjaCombine.addPart(new JinjaText(line,text));
             }
             else {
-               JinjaText text = (JinjaText) visit(ctx.combineHalf().get(i).jinjaId());
-               builder.append(text.getText());
+                JinjaId text = (JinjaId) visit(ctx.combineHalf().get(i).jinjaId());
+               jinjaCombine.addPart(text);
             }
 
         }
-        return new JinjaText(line,builder.toString());
+        return jinjaCombine;
     }
 
     @Override
     public JinjaAssign visitJinjaExpressionAssign(JinjaHtmlParser.JinjaExpressionAssignContext ctx) {
         int line = ctx.start.getLine();
-        JinjaAssign assign = new JinjaAssign(line,(JinjaText) visit(ctx.jinjaId()),(JinjaExpr) visit(ctx.expr()));
+        JinjaAssign assign = new JinjaAssign(line,(JinjaId) visit(ctx.jinjaId()),(JinjaExpr) visit(ctx.expr()));
         return assign;
     }
 
@@ -608,21 +613,23 @@ public class JinjaHtmlVisitor extends JinjaHtmlParserBaseVisitor{
     @Override
     public JinjaStatement visitJinjaStmt(JinjaHtmlParser.JinjaStmtContext ctx) {
         int line = ctx.start.getLine();
-        StringBuilder builder = new StringBuilder();
 
-        if(ctx.stmtBody() != null){
-            for (int i = 0;i < ctx.stmtBody().size();i++) {
-                if (ctx.stmtBody().get(i).jinjaId()!= null){
-                    JinjaText text = (JinjaText) visit(ctx.stmtBody().get(i).jinjaId());
-                    builder.append(text.getText());
 
+        JinjaStatement jinjaStatement = new JinjaStatement(line);
+
+        if (ctx.stmtBody() != null) {
+            for (int i = 0; i < ctx.stmtBody().size(); i++) {
+                JinjaHtmlParser.StmtBodyContext body = ctx.stmtBody().get(i);
+
+                if (body.jinjaId() != null) {
+                    jinjaStatement.addText((JinjaId) visit(body.jinjaId()));
+                } else if (body.JINJA_STRING() != null) {
+                    jinjaStatement.addText(new JinjaText(line, body.JINJA_STRING().getText()));
+                } else if (body.JINJA_TEXT_STMT() != null) {
+                    jinjaStatement.addText(new JinjaText(line, body.JINJA_TEXT_STMT().getText()));
                 }
-                else {
-                    builder.append(ctx.stmtBody().get(i).getText());
-                }
-
             }
         }
-        return new JinjaStatement(line,builder.toString());
+        return jinjaStatement;
     }
 }
