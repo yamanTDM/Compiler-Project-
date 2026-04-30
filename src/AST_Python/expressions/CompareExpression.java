@@ -2,21 +2,22 @@ package AST_Python.expressions;
 
 import AST_Python.Expression;
 
-public abstract class CompareExpression extends Expression {
-    private final NumbericExpression leftExpression;
-    private final NumbericExpression rightExpression;
-    public CompareExpression(int line, String name, NumbericExpression leftExpression, NumbericExpression rightExpression) {
-        super(line, name);
-        this.leftExpression = leftExpression;
-        this.rightExpression = rightExpression;
+import java.util.ArrayList;
+import java.util.List;
+
+public class CompareExpression extends Expression {
+    private final List<Comparision> comparisons;
+
+    public CompareExpression(int line) {
+        super(line, "Compare Expression");
+        comparisons = new ArrayList<Comparision>();
+    }
+    public void addComparison(Comparision comparison) {
+        comparisons.add(comparison);
     }
 
-    public NumbericExpression getLeftExpression() {
-        return leftExpression;
-    }
-
-    public NumbericExpression getRightExpression() {
-        return rightExpression;
+    public List<Comparision> getComparisons() {
+        return comparisons;
     }
 
     @Override
@@ -24,10 +25,10 @@ public abstract class CompareExpression extends Expression {
         StringBuilder sb = new StringBuilder();
         sb.append(super.print(indent)).append("{\n");
         String indentation = indent + "\t";
-        sb.append(leftExpression.print(indentation)).append("\n");
-        sb.append(rightExpression.print(indentation)).append("\n");
+        for (Comparision comparison : comparisons) {
+            sb.append(comparison.print(indentation)).append("\n");
+        }
         sb.append(indent).append("}");
         return sb.toString();
-
     }
 }

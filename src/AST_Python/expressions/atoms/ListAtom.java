@@ -1,7 +1,7 @@
 package AST_Python.expressions.atoms;
 
-import AST2.Expressions.Atom;
 import AST_Python.Expression;
+import AST_Python.expressions.Atom;
 
 import java.util.ArrayList;
 import java.util.List;

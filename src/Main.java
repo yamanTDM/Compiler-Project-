@@ -1,6 +1,7 @@
 import AST.Attribute;
-import AST.Program;
+import AST_Python.Program;
 import Visitor.JinjaHtmlVisitor;
+import Visitor.PythonVisitor;
 import antlr.*;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -32,7 +33,7 @@ public class Main {
         Program program = (Program) visitor.visit(ast);
         System.out.println(program);
 
- */
+
         String test = """
 from os.path import exists, join
 import json
@@ -91,5 +92,16 @@ check = x > 5 and y < 20 or not False
         ParseTree tree = parser.prog();
         System.out.println(tree.toStringTree(parser));
 
+
+ */
+        String source = "Tests/test.txt";
+        CharStream input = CharStreams.fromFileName(source);
+        PythonIndentLexer lexer = new PythonIndentLexer(input);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        PythonParser parser = new PythonParser(tokens);
+        ParseTree ast = parser.prog();
+        PythonVisitor visitor = new PythonVisitor();
+        AST_Python.Program program = (AST_Python.Program) visitor.visit(ast);
+        System.out.println(program.print(""));
     }
 }

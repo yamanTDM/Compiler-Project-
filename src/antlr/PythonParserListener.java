@@ -268,6 +268,16 @@ public interface PythonParserListener extends ParseTreeListener {
 	 */
 	void exitIf_stmt(PythonParser.If_stmtContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link PythonParser#else_if_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void enterElse_if_stmt(PythonParser.Else_if_stmtContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PythonParser#else_if_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void exitElse_if_stmt(PythonParser.Else_if_stmtContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link PythonParser#with_stmt}.
 	 * @param ctx the parse tree
 	 */

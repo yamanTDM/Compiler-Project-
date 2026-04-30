@@ -26,7 +26,7 @@ public class Body extends Node{
         sb.append(super.print(indent)).append("{\n");
         String indentaion = indent + "\t";
         for (Statement statement : statements) {
-            sb.append(super.print(indentaion)).append("\n");
+            sb.append(statement.print(indentaion)).append("\n");
         }
         sb.append(indent).append("}");
         return sb.toString();

@@ -1,6 +1,5 @@
 package AST_Python.expressions;
 
-import AST2.Expr;
 import AST_Python.Expression;
 
 import java.util.ArrayList;

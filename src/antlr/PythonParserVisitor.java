@@ -164,6 +164,12 @@ public interface PythonParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitIf_stmt(PythonParser.If_stmtContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link PythonParser#else_if_stmt}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitElse_if_stmt(PythonParser.Else_if_stmtContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link PythonParser#with_stmt}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

@@ -14,7 +14,7 @@ public class AccessFunctionExpression extends NumbericExpression{
         this.object = object;
         this.arguments = new ArrayList<>();
     }
-    void addArgument(Expression argument){
+    public void addArgument(Expression argument){
         this.arguments.add(argument);
     }
 

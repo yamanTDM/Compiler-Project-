@@ -51,8 +51,10 @@ public class IfStatement extends CompoundStatement {
         sb.append(condition.print(indentation)).append("\n");
         sb.append(indent).append("If Body:").append("\n");
         sb.append(ifBody.print(indentation)).append("\n");
-        sb.append(indent).append("Else if Statements:").append("\n");
+        if (!elseIfStatements.isEmpty()) {
+            sb.append(indent).append("Else if Statements:").append("\n");
 
+        }
         for (ElseIfStatement elseIfStatement : elseIfStatements) {
             sb.append(elseIfStatement.print(indentation)).append("\n");
         }

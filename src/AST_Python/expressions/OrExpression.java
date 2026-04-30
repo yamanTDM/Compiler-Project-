@@ -2,21 +2,20 @@ package AST_Python.expressions;
 
 import AST_Python.Expression;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class OrExpression extends Expression {
-    private final Expression leftExpression;
-    private final Expression rightExpression;
-    public OrExpression(int line,Expression leftExpression, Expression rightExpression) {
+    private final List<Expression> expressions;
+    public OrExpression(int line) {
         super(line,"Or Expression");
-        this.leftExpression = leftExpression;
-        this.rightExpression = rightExpression;
+        this.expressions = new ArrayList<>();
     }
-
-    public Expression getLeftExpression() {
-        return leftExpression;
+    public void addExpression(Expression expression){
+        expressions.add(expression);
     }
-
-    public Expression getRightExpression() {
-        return rightExpression;
+    public List<Expression> getExpressions() {
+        return expressions;
     }
 
     @Override
@@ -24,10 +23,9 @@ public class OrExpression extends Expression {
         StringBuilder sb = new StringBuilder();
         sb.append(super.print(indent)).append("{\n");
         String indentation = indent + "\t";
-        sb.append(indentation).append("leftExpression: \n");
-        sb.append(leftExpression.print(indentation)).append("\n");
-        sb.append(indentation).append("rightExpression: \n");
-        sb.append(rightExpression.print(indentation)).append("\n");
+        for (Expression expression : expressions) {
+            sb.append(expression.print(indentation)).append("\n");
+        }
         sb.append(indent).append("}");
         return sb.toString();
     }

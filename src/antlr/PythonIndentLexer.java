@@ -164,6 +164,7 @@ public class PythonIndentLexer extends PythonLexer {
      * with no trailing newline).
      */
     private Token handleEof(Token eof) {
+        enqueue(syntheticToken(NEWLINE, "<NEWLINE>", eof)); // ← add this
         while (indentStack.peek() > 0) {
             indentStack.pop();
             enqueue(syntheticToken(DEDENT, "<DEDENT>", eof));
@@ -171,7 +172,6 @@ public class PythonIndentLexer extends PythonLexer {
         enqueue(eof);
         return pending.poll();
     }
-
     /**
      * Increments/decrements {@code bracketDepth} for open/close brackets.
      * Keeps the implicit-line-joining state consistent for every token,
