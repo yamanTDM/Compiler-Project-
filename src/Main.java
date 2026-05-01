@@ -1,5 +1,6 @@
 import AST.Attribute;
 import AST_Python.Program;
+import SymbolTable.SymbolTable;
 import Visitor.JinjaHtmlVisitor;
 import Visitor.PythonVisitor;
 import antlr.*;
@@ -14,7 +15,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
 /*
 
-            String source = "Tests/test.txt";
+        String source = "Tests/test.txt";
         CharStream input = CharStreams.fromFileName(source);
         PythonLexer lexer = new PythonLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -101,7 +102,12 @@ check = x > 5 and y < 20 or not False
         PythonParser parser = new PythonParser(tokens);
         ParseTree ast = parser.prog();
         PythonVisitor visitor = new PythonVisitor();
-        AST_Python.Program program = (AST_Python.Program) visitor.visit(ast);
+        AST_Python.Program program =(Program) visitor.visit(ast);
         System.out.println(program.print(""));
+        SymbolTable table = visitor.getSymbolTable();
+        table.print(System.out);
+
+// look
+
     }
 }

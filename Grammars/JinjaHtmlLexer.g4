@@ -216,7 +216,7 @@ CSS_NUMBER
 CSS_MATH : '+' | '-' | '/';
 
 CSS_UNIT
-    : 'px' | 'em' | 'rem' | '%' | 'vh' | 'vw' | 'deg' | 'fr'
+    : 'px' | 'em' | 'rem' | '%' | 'vh' | 'vw' | 'deg' | 'fr' | 's' | 'ms'
     ;
 
 CSS_STRING

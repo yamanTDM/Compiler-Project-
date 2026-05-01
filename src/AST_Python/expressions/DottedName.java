@@ -4,6 +4,7 @@ import AST_Python.Expression;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 public class DottedName extends Expression {
     private final List<String> names;
@@ -21,5 +22,11 @@ public class DottedName extends Expression {
     public List<String> getNames() {
         return names;
     }
-
+    public String fullName() {
+        StringJoiner joiner = new StringJoiner(".");
+        for (String name : names) {
+            joiner.add(name);
+        }
+        return joiner.toString();
+    }
 }

@@ -17,6 +17,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 # -----------------------
 # Load / Save functions
 # -----------------------
+
 def load_products():
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, "r") as f:

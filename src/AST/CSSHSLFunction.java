@@ -25,11 +25,20 @@ public class CSSHSLFunction extends CSSFunction {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(super.name).append("- hsl");
         stringBuilder.append("(");
-        stringBuilder.append(unitH);
+        stringBuilder.append(h);
+        if (unitH != null) {
+            stringBuilder.append(unitH);
+        }
         stringBuilder.append(", ");
-        stringBuilder.append(unitS);
+        stringBuilder.append(s);
+        if (unitS != null) {
+            stringBuilder.append(unitS);
+        }
         stringBuilder.append(", ");
-        stringBuilder.append(unitL);
+        stringBuilder.append(l);
+        if (unitL != null) {
+            stringBuilder.append(unitL);
+        }
         stringBuilder.append(")");
         return stringBuilder.toString();
 

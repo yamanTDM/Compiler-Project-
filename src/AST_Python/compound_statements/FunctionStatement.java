@@ -30,7 +30,10 @@ public class FunctionStatement extends CompoundStatement {
     public Body getBody() {
         return body;
     }
-
+    public void setParameters(List<Parameter> parameters) {
+        this.parameters.clear();
+        this.parameters.addAll(parameters);
+    }
     @Override
     public String print(String indent) {
         StringBuilder sb = new StringBuilder();

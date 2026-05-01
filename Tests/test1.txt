@@ -1,110 +1,200 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <title>>Product App</title>
+    <title>Products App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background: #4b4b4b;
-        }
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    background: #f4f6f9;
+}
 
-        nav {
-            background: #131313;
-            padding: 10px;
-        }
-
-        nav a {
-            color: #fff;
-            margin-right: 15px;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 20px auto;
-        }
-
-        .product-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
-            /* 4 equal columns */
-            gap: 20px;
-        }
+nav {
+    background: #111827;
+    padding: 15px;
+    display: flex;
+    gap: 15px;
+}
 
 
-        .product-card {
-            padding: 15px;
-            background: #c0c0c0;
-            border-radius: 8px;
-            position: relative;
-            text-align: center;
-            padding-bottom: 60px;
 
-        }
+nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+}
 
-        .product-card img {
-            width: 100%;
-            border-radius: 5px;
-        }
+.container {
+    padding: 30px;
+}
 
-        .detail-img {
-            width: 300px;
-            border-radius: 10px;
-            display: block;
-            margin-bottom: 20px;
-        }
+/* GRID */
+.grid {
+    display: grid;
+    grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr;
+    gap: 20px;
+}
 
-        form label {
-            display: block;
-            margin-top: 10px;
-        }
+/* CARD */
+.card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px hsl(0, 0%, 44%);
+    transition: 0.2s;
+}
 
-        form input,
-        form textarea {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-        }
+.card img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+}
 
-        .btn {
-            display: inline-block;
+.card h3 {
+    margin: 10px;
+}
 
+.card p {
+    margin: 0 10px 10px;
+    color: #555;
+}
 
-            margin-top: 15px;
-            padding: 10px 15px;
-            background: hsl(0, 100%, 22%);
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-        }
+/* BUTTONS */
+.card a, .card button {
+    display: inline-block;
+    margin: 10px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+}
 
-        #button {
-            position: absolute;
-            /* Add this */
-            bottom: 15px;
-            /* Stick to bottom */
-            left: 50%;
-            transform: translateX(-50%);
-            width: calc(100% - 100px);
-            /* Optional: make width match padding */
+.card a {
+    background: #3b82f6;
+    color: white;
+}
 
-        }
+.delete {
+    background: #ef4444;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+/* FORM */
+/* CENTER FORM PAGE */
+.form-container {
+    max-width: 500px;
+    margin: 0 auto;        /* centers horizontally */
+    text-align: center;
+}
+
+/* Make inputs full width inside container */
+.form-container input,
+.form-container textarea {
+    width: 100%;
+}
+form input, form textarea {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+}
+
+button {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* DETAIL */
+.detail-img {
+    width: 350px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+/* DETAIL PAGE */
+.detail-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.detail-card {
+    display: flex;
+    gap: 40px;
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px hsl(0, 0%, 44%);
+    max-width: 900px;
+    width: 100%;
+}
+
+/* IMAGE */
+.detail-image img {
+    width: 550px;
+    height: 550px;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+/* INFO */
+.detail-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.detail-info h1 {
+    margin-bottom: 10px;
+}
+
+/* PRICE */
+.price {
+    font-size: 22px;
+    font-weight: bold;
+    color: #10b981;
+    margin-bottom: 15px;
+}
+
+/* DESCRIPTION */
+.description {
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    max-width: 400px;
+}
+
+/* BACK BUTTON */
+.back-btn {
+    display: inline-block;
+    width: fit-content;
+    background: #3b82f6;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+}
     </style>
 </head>
-
 <body>
 
-    <nav>
-        <a href="{{ url_for('index') }}">Home</a>
-        <a href="{{ url_for('add_product') }}">Add Product</a>
-    </nav>
+<nav>
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('add') }}">Add Product</a>
+</nav>
 
-    <div class="container">
-        {% block content %}{% endblock %}
-    </div>
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
 
 </body>
-
 </html>

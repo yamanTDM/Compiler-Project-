@@ -250,7 +250,11 @@ public class JinjaHtmlVisitor extends JinjaHtmlParserBaseVisitor{
     @Override
     public CSSNumber visitNumberTerm(JinjaHtmlParser.NumberTermContext ctx) {
         int line = ctx.start.getLine();
-        CSSNumber number = new CSSNumber(line,Double.valueOf(ctx.CSS_NUMBER().getText()),ctx.CSS_UNIT().getText());
+        String unit = null;
+        if (ctx.CSS_UNIT() != null) {
+            unit = ctx.CSS_UNIT().getText();
+        }
+        CSSNumber number = new CSSNumber(line,Double.valueOf(ctx.CSS_NUMBER().getText()),unit);
         return number;
     }
 
