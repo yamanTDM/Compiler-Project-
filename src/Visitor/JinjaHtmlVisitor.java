@@ -1,11 +1,28 @@
 package Visitor;
 
 import AST.*;
+import SymbolTable.*;
 import antlr.JinjaHtmlParser;
 import antlr.JinjaHtmlParserBaseVisitor;
+import org.antlr.v4.runtime.tree.TerminalNode;
+
+import java.util.Objects;
 
 
 public class JinjaHtmlVisitor extends JinjaHtmlParserBaseVisitor{
+
+    SymbolTable symbolTable;
+    public JinjaHtmlVisitor(){
+        symbolTable = new SymbolTable();
+    }
+    public JinjaHtmlVisitor(SymbolTable symbolTable, int number){
+        this.symbolTable = symbolTable;
+        symbolTable.enterScope("File " + number );
+    }
+    public SymbolTable getSymbolTable() {
+        return symbolTable;
+    }
+
     @Override
     public Program visitProg(JinjaHtmlParser.ProgContext ctx) {
         int line = ctx.start.getLine();
@@ -16,6 +33,7 @@ public class JinjaHtmlVisitor extends JinjaHtmlParserBaseVisitor{
 
             }
         }
+        symbolTable.exitScope();
         return program;
     }
 
@@ -108,13 +126,27 @@ public class JinjaHtmlVisitor extends JinjaHtmlParserBaseVisitor{
     @Override
     public Attribute visitAttribute(JinjaHtmlParser.AttributeContext ctx) {
         int line = ctx.start.getLine();
+        String name = ctx.ID().getText();
+
         Attribute attribute;
         if(ctx.attributeValue() != null) {
             AttributeValue value = (AttributeValue) visit(ctx.attributeValue());
-            attribute = new Attribute(line, ctx.ID().getText(),value);
+            attribute = new Attribute(line, name,value);
+            if (name.equals("class")) {
+                if (value instanceof AttributeString){
+                    symbolTable.defineInGlobal(((AttributeString) value).getValue(),SymbolKind.CLASS,line,false);
+
+                }
+            }
+            if (name.equals("id")) {
+                if (value instanceof AttributeString){
+                    symbolTable.defineInGlobal(((AttributeString) value).getValue(),SymbolKind.ID,line,false);
+                }
+            }
+
 
         }else {
-            attribute = new Attribute(line, ctx.ID().getText());
+            attribute = new Attribute(line, name);
         }
         return attribute;
     }
@@ -214,13 +246,33 @@ public class JinjaHtmlVisitor extends JinjaHtmlParserBaseVisitor{
     @Override
     public CSSClassSelector visitClassSelector(JinjaHtmlParser.ClassSelectorContext ctx) {
         int line = ctx.start.getLine();
-        CSSClassSelector classSelector = new CSSClassSelector(line,ctx.CSS_NAME().getText());
+        String name = ctx.CSS_NAME().getText();
+        Symbol symbol = symbolTable.lookup(name);
+        if (symbol == null) {
+            System.out.println("Class " + name + " at line " + line +" not found");
+            //return null;
+        }
+        if (symbol != null && symbol.getKind() != SymbolKind.CLASS){
+            System.out.println("Class " + name + " at line " + line +" not found");
+            //return null;
+        }
+        CSSClassSelector classSelector = new CSSClassSelector(line,name);
         return classSelector;
     }
 
     @Override
     public CSSIDSelector visitIdSelector(JinjaHtmlParser.IdSelectorContext ctx) {
         int line = ctx.start.getLine();
+        String name = ctx.CSS_NAME().getText();
+        Symbol symbol = symbolTable.lookup(name);
+        if (symbol == null) {
+            System.out.println("Id " + name + " at line " + line +" not found");
+            //return null;
+        }
+        if (symbol != null && symbol.getKind() != SymbolKind.ID){
+            System.out.println("Id " + name + " at line " + line +" not found");
+            //return null;
+        }
         CSSIDSelector idSelector = new CSSIDSelector(line,ctx.CSS_NAME().getText());
         return idSelector;
     }
@@ -411,6 +463,9 @@ public class JinjaHtmlVisitor extends JinjaHtmlParserBaseVisitor{
         JinjaBlock block;
 
         JinjaId name = (JinjaId) visit(ctx.jinjaBlockStart().jinjaId());
+        symbolTable.defineInGlobal(name.getFullName(),SymbolKind.BLOCK,line,false);
+        symbolTable.enterScope(name.getFullName() + " Block");
+
         if (ctx.jinjaSuperBlock() != null) {
             JinjaSuperBlock superBlock = new JinjaSuperBlock(line);
              block = new JinjaBlock(line, name, superBlock);
@@ -424,6 +479,7 @@ public class JinjaHtmlVisitor extends JinjaHtmlParserBaseVisitor{
                 block.addBody(bodyNode);
             }
         }
+        symbolTable.exitScope();
 
         return block;
 
@@ -493,22 +549,85 @@ public class JinjaHtmlVisitor extends JinjaHtmlParserBaseVisitor{
     @Override
     public VariableCondition visitJinjaVaraiableConditon(JinjaHtmlParser.JinjaVaraiableConditonContext ctx) {
         int line = ctx.start.getLine();
-        VariableCondition condition = new VariableCondition(line,ctx.jinjaVariable().getText());
+        String text;
+        if (ctx.jinjaVariable().jinjaId() != null) {
+            JinjaId jinjaId = (JinjaId) visit(ctx.jinjaVariable().jinjaId());
+            Symbol symbol = symbolTable.lookup(jinjaId.getFullName());
+            if (symbol == null) {
+                System.out.println("Symbol " + jinjaId.getFullName() + " not found");
+                //return null;
+            }
+            if (symbol != null && symbol.getKind() != SymbolKind.VARIABLE) {
+                System.out.println("Symbol " + jinjaId.getFullName() + " is not a variable");
+                //return null;
+            }
+            text = jinjaId.getFullName();
+        }
+        else {
+            text = ctx.jinjaVariable().getText();
+        }
+        VariableCondition condition = new VariableCondition(line,text);
+
         return condition;
     }
 
     @Override
     public CompareCondition visitJinjaCompareCondition(JinjaHtmlParser.JinjaCompareConditionContext ctx) {
         int line = ctx.start.getLine();
-        CompareCondition condition = new CompareCondition(line,ctx.jinjaVariable().getFirst().getText(),ctx.compare().getText(),ctx.jinjaVariable().getLast().getText());
+        String text1;
+        if (ctx.jinjaVariable().getFirst().jinjaId() != null) {
+            JinjaId jinjaId = (JinjaId) visit(ctx.jinjaVariable().getFirst().jinjaId());
+            Symbol symbol = symbolTable.lookup(jinjaId.getFullName());
+            if (symbol == null) {
+                System.out.println("Symbol " + jinjaId.getFullName() + " not found");
+                //return null;
+            }
+            if (symbol != null && symbol.getKind() != SymbolKind.VARIABLE) {
+                System.out.println("Symbol " + jinjaId.getFullName() + " is not a variable");
+                //return null;
+            }
+            text1 = jinjaId.getFullName();
+        }
+        else {
+            text1 = ctx.jinjaVariable().getFirst().getText();
+        }
+        String text2;
+        if (ctx.jinjaVariable().getLast().jinjaId() != null) {
+            JinjaId jinjaId = (JinjaId) visit(ctx.jinjaVariable().getLast().jinjaId());
+            Symbol symbol = symbolTable.lookup(jinjaId.getFullName());
+            if (symbol == null) {
+                System.out.println("Symbol " + jinjaId.getFullName() + " not found");
+                //return null;
+            }
+            if (symbol != null && symbol.getKind() != SymbolKind.VARIABLE) {
+                System.out.println("Symbol " + jinjaId.getFullName() + " is not a variable");
+                //return null;
+            }
+            text2 = jinjaId.getFullName();
+        }
+        else {
+            text2 = ctx.jinjaVariable().getLast().getText();
+        }
+        CompareCondition condition = new CompareCondition(line,text1,ctx.compare().getText(),text2);
         return condition;
     }
 
     @Override
     public JinjaFor visitJinjaForLoop(JinjaHtmlParser.JinjaForLoopContext ctx) {
         int line = ctx.start.getLine();
+        symbolTable.enterScope("Jinja For Loop");
         JinjaId itemName =(JinjaId) visit(ctx.jinjaFor().jinjaId().getFirst());
+        symbolTable.define(itemName.getFullName(),SymbolKind.LOOP_VAR,line,false);
         JinjaId collectionName =(JinjaId) visit(ctx.jinjaFor().jinjaId().get(1));
+        Symbol symbol = symbolTable.lookup(collectionName.getFullName());
+        if (symbol == null) {
+            System.out.println("Symbol " + collectionName.getFullName() + " not found");
+            //return null;
+        }
+        if (symbol != null && symbol.getKind() != SymbolKind.VARIABLE) {
+            System.out.println("Symbol " + collectionName.getFullName() + " is not a variable");
+            //return null;
+        }
         Condition condition = null;
         if(ctx.jinjaFor().jinjaConditions() != null) {
             condition = (Condition) visit(ctx.jinjaFor().jinjaConditions());
@@ -524,6 +643,7 @@ public class JinjaHtmlVisitor extends JinjaHtmlParserBaseVisitor{
             }
         }
         JinjaFor jinjaFor = new JinjaFor(line,itemName,collectionName,condition,body,elseBody);
+        symbolTable.exitScope();
         return jinjaFor;
     }
 
@@ -569,7 +689,9 @@ public class JinjaHtmlVisitor extends JinjaHtmlParserBaseVisitor{
     @Override
     public JinjaFunction visitJinjaExpressionFunction(JinjaHtmlParser.JinjaExpressionFunctionContext ctx) {
         int line = ctx.start.getLine();
-        JinjaFunction function = new JinjaFunction(line,(JinjaId) visit(ctx.functionCall().jinjaId()));
+        JinjaId jinjaId = (JinjaId) visit(ctx.functionCall().jinjaId());
+
+        JinjaFunction function = new JinjaFunction(line,jinjaId);
         for (int i = 0;i < ctx.functionCall().expr().size();i++) {
             JinjaExpr expr = (JinjaExpr) visit(ctx.functionCall().expr().get(i));
             function.addArgument(expr);
@@ -609,7 +731,17 @@ public class JinjaHtmlVisitor extends JinjaHtmlParserBaseVisitor{
     @Override
     public JinjaAssign visitJinjaExpressionAssign(JinjaHtmlParser.JinjaExpressionAssignContext ctx) {
         int line = ctx.start.getLine();
-        JinjaAssign assign = new JinjaAssign(line,(JinjaId) visit(ctx.jinjaId()),(JinjaExpr) visit(ctx.expr()));
+        JinjaId jinjaId = (JinjaId) visit(ctx.jinjaId());
+        Symbol symbol = symbolTable.lookup(jinjaId.getFullName());
+        if (symbol == null) {
+            System.out.println("Symbol " + jinjaId.getFullName() + " not found");
+            //return null;
+        }
+        if (symbol != null && symbol.getKind() != SymbolKind.VARIABLE) {
+            System.out.println("Symbol " + jinjaId.getFullName() + " is not a variable");
+            //return null;
+        }
+        JinjaAssign assign = new JinjaAssign(line,jinjaId,(JinjaExpr) visit(ctx.expr()));
         return assign;
     }
 

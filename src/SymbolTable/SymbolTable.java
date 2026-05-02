@@ -57,7 +57,7 @@ public class SymbolTable {
 
     // ── construction ──────────────────────────────────────────────────────────
     public SymbolTable() {
-        globalScope = new Scope("global", Scope.Kind.GLOBAL, null);
+        globalScope = new Scope("global", null);
         pushScope(globalScope);
     }
 
@@ -76,7 +76,7 @@ public class SymbolTable {
      * the stack.
      */
     public void enterScope(String name) {
-        Scope newScope = new Scope(name, Scope.Kind.FUNCTION, currentScope());
+        Scope newScope = new Scope(name, currentScope());
         pushScope(newScope);
     }
 

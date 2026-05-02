@@ -1,5 +1,5 @@
 import AST.Attribute;
-import AST_Python.Program;
+import AST.Program;
 import SymbolTable.SymbolTable;
 import Visitor.JinjaHtmlVisitor;
 import Visitor.PythonVisitor;
@@ -14,25 +14,19 @@ import java.io.IOException;
 public class Main {
     public static void main(String[] args) throws IOException {
 /*
-
-        String source = "Tests/test.txt";
+  String source = "Tests/test.txt";
         CharStream input = CharStreams.fromFileName(source);
-        PythonLexer lexer = new PythonLexer(input);
+        PythonIndentLexer lexer = new PythonIndentLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         PythonParser parser = new PythonParser(tokens);
-        ParseTree ast = parser.file_input();
-        PythonVisitor visitor = new PythonVisitor();
-        AST2.Program program = (AST2.Program) visitor.visit(ast);
-        System.out.println(program.print(""));
-        String source = "Tests/test4.txt";
-        CharStream input = CharStreams.fromFileName(source);
-        JinjaHtmlLexer lexer = new JinjaHtmlLexer(input);
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        JinjaHtmlParser parser = new JinjaHtmlParser(tokens);
         ParseTree ast = parser.prog();
-        JinjaHtmlVisitor visitor = new JinjaHtmlVisitor();
-        Program program = (Program) visitor.visit(ast);
-        System.out.println(program);
+        PythonVisitor visitor = new PythonVisitor();
+        AST_Python.Program program =(Program) visitor.visit(ast);
+        System.out.println(program.print(""));
+        SymbolTable table = visitor.getSymbolTable();
+        table.print(System.out);
+
+
 
 
         String test = """
@@ -95,17 +89,21 @@ check = x > 5 and y < 20 or not False
 
 
  */
-        String source = "Tests/test.txt";
-        CharStream input = CharStreams.fromFileName(source);
-        PythonIndentLexer lexer = new PythonIndentLexer(input);
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        PythonParser parser = new PythonParser(tokens);
-        ParseTree ast = parser.prog();
-        PythonVisitor visitor = new PythonVisitor();
-        AST_Python.Program program =(Program) visitor.visit(ast);
-        System.out.println(program.print(""));
-        SymbolTable table = visitor.getSymbolTable();
-        table.print(System.out);
+        SymbolTable symbolTable = new SymbolTable();
+        for (int i = 1; i<= 4;i++) {
+            String source = "Tests/test"+ i+".txt";
+            CharStream input = CharStreams.fromFileName(source);
+            JinjaHtmlLexer lexer = new JinjaHtmlLexer(input);
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            JinjaHtmlParser parser = new JinjaHtmlParser(tokens);
+            ParseTree ast = parser.prog();
+            JinjaHtmlVisitor visitor = new JinjaHtmlVisitor(symbolTable, i);
+            AST.Program program = (Program) visitor.visit(ast);
+            System.out.println(program);
+            symbolTable = visitor.getSymbolTable();
+        }
+
+        symbolTable.print(System.out);
 
 // look
 

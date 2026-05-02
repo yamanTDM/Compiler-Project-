@@ -221,7 +221,7 @@ public class PythonVisitor extends PythonParserBaseVisitor {
                 Parameter parameter = new Parameter(line, ctx.param_list().NAME(i).getText());
                 parameters.add(parameter);
                 symbolTable.addParameter(name, parameter.getParameter());
-                symbolTable.define(parameter.getParameter(), SymbolKind.VARIABLE, line, false);
+                symbolTable.define(parameter.getParameter(), SymbolKind.PARAMETER, line, false);
             }
         }
         Body body = visitSuite(ctx.suite());
@@ -502,7 +502,7 @@ public class PythonVisitor extends PythonParserBaseVisitor {
         Expression output = (Expression) visit(ctx.expr());
         String name = ctx.comp_for().NAME().getText();
         symbolTable.enterScope("Comprehension");
-        symbolTable.define(name,SymbolKind.VARIABLE,line,false);
+        symbolTable.define(name,SymbolKind.LOOP_VAR,line,false);
         Expression list = (Expression) visit(ctx.comp_for().expr().getFirst());
         Expression condition = null;
         if (ctx.comp_for().expr().size() > 1) {
