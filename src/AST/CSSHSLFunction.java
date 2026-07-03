@@ -1,5 +1,10 @@
 package AST;
 
+import Visitor.ASTVisitorJinja;
+
+import java.util.Collections;
+import java.util.List;
+
 public class CSSHSLFunction extends CSSFunction {
     private final double h, s, l;
     private final String unitH, unitS, unitL; // optional units
@@ -41,6 +46,14 @@ public class CSSHSLFunction extends CSSFunction {
         }
         stringBuilder.append(")");
         return stringBuilder.toString();
+
+    }
+    public List<Node> getChildrenSearch() {
+        return Collections.emptyList();
+    }
+    public <T> T accept(ASTVisitorJinja<T> visitor) {
+
+        return visitor.visit(this);
 
     }
 }

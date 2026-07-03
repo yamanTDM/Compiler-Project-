@@ -1,5 +1,10 @@
 package AST;
 
+import Visitor.ASTVisitorJinja;
+
+import java.util.Collections;
+import java.util.List;
+
 public class CSSTranslateFunction extends CSSFunction {
     private final Double x, y;
     private final String unitX, unitY;
@@ -42,6 +47,14 @@ public class CSSTranslateFunction extends CSSFunction {
         }
         stringBuilder.append(" )");
         return stringBuilder.toString();
+
+    }
+    public List<Node> getChildrenSearch() {
+        return Collections.emptyList();
+    }
+    public <T> T accept(ASTVisitorJinja<T> visitor) {
+
+        return visitor.visit(this);
 
     }
 }

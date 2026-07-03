@@ -2,6 +2,7 @@ package AST_Python.expressions;
 
 import AST_Python.Expression;
 import AST_Python.Node;
+import Visitor.ASTVisitor;
 
 public class DictionaryEntry extends Node {
     private final Expression key;
@@ -27,5 +28,11 @@ public class DictionaryEntry extends Node {
         sb.append(value.print(indentation)).append("\n");
         sb.append(indent).append("}");
         return sb.toString();
+    }
+    @Override
+    public <T> T accept(ASTVisitor<T> visitor) {
+
+        return visitor.visit(this);
+
     }
 }

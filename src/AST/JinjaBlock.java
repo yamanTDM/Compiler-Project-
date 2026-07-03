@@ -1,5 +1,7 @@
 package AST;
 
+import Visitor.ASTVisitorJinja;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,5 +54,15 @@ public class JinjaBlock extends JinjaNode{
         }
         stringBuilder.append(indent).append("}\n");
         return stringBuilder.toString();
+    }
+
+    @Override
+    public List<Node> getChildrenSearch() {
+        return new ArrayList<>(bodies);
+    }
+    public <T> T accept(ASTVisitorJinja<T> visitor) {
+
+        return visitor.visit(this);
+
     }
 }

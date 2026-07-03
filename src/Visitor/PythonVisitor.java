@@ -15,15 +15,6 @@ import java.util.IllegalFormatCodePointException;
 import java.util.List;
 
 public class PythonVisitor extends PythonParserBaseVisitor {
-    private final SymbolTable symbolTable;
-
-    public PythonVisitor() {
-        this.symbolTable = new SymbolTable();
-    }
-
-    public SymbolTable getSymbolTable() {
-        return symbolTable;
-    }
 
     @Override
     public Program visitProg(PythonParser.ProgContext ctx) {
@@ -116,7 +107,6 @@ public class PythonVisitor extends PythonParserBaseVisitor {
         for (int i = 0; i < ctx.NAME().size(); i++) {
             String name = ctx.NAME(i).getText();
             global.addVariable(name);
-            symbolTable.define(name, SymbolKind.VARIABLE, line, true);
 
         }
         return global;
@@ -141,9 +131,7 @@ public class PythonVisitor extends PythonParserBaseVisitor {
             return new ExpressionStatement(line, expression);
         }
         Expression secondExpression = (Expression) visit(ctx.expr().get(1));
-        if (expression instanceof NameAtom) {
-            symbolTable.define(((NameAtom) expression).getName(), SymbolKind.VARIABLE, line, false);
-        }
+
         if (ctx.assign_op() instanceof PythonParser.OpAssignContext) {
             return new AssignStatement(line, expression, secondExpression);
         } else if (ctx.assign_op() instanceof PythonParser.OpPlusAssignContext) {
@@ -202,7 +190,6 @@ public class PythonVisitor extends PythonParserBaseVisitor {
         String name = null;
         if (ctx.NAME() != null) {
             name = ctx.NAME().getText();
-            symbolTable.define(name, SymbolKind.VARIABLE, line, false);
         }
         Body body = visitSuite(ctx.suite());
         WithStatement withStatement = new WithStatement(line, expression, name, body);
@@ -213,21 +200,18 @@ public class PythonVisitor extends PythonParserBaseVisitor {
     public FunctionStatement visitFuncdef(PythonParser.FuncdefContext ctx) {
         int line = ctx.start.getLine();
         String name = ctx.NAME().getText();
-        symbolTable.define(name, SymbolKind.FUNCTION, line, false);
-        symbolTable.enterScope(name);
+
         List<Parameter> parameters = new ArrayList<>();
         if (ctx.param_list() != null) {
             for (int i = 0; i < ctx.param_list().NAME().size(); i++) {
                 Parameter parameter = new Parameter(line, ctx.param_list().NAME(i).getText());
                 parameters.add(parameter);
-                symbolTable.addParameter(name, parameter.getParameter());
-                symbolTable.define(parameter.getParameter(), SymbolKind.PARAMETER, line, false);
+
             }
         }
         Body body = visitSuite(ctx.suite());
         FunctionStatement functionStatement = new FunctionStatement(line, name, body);
         functionStatement.setParameters(parameters);
-        symbolTable.exitScope();
         return functionStatement;
     }
 
@@ -449,10 +433,10 @@ public class PythonVisitor extends PythonParserBaseVisitor {
             sb.append(ctx.STRING().get(i).getText());
         }
         String string = sb.toString();
+        string = string.replaceAll("^['\"]|['\"]$", "");
         StringAtom stringAtom = new StringAtom(line, string);
         return stringAtom;
     }
-
     @Override
     public NoneAtom visitNoneAtom(PythonParser.NoneAtomContext ctx) {
         int line = ctx.start.getLine();
@@ -501,14 +485,12 @@ public class PythonVisitor extends PythonParserBaseVisitor {
         int line = ctx.start.getLine();
         Expression output = (Expression) visit(ctx.expr());
         String name = ctx.comp_for().NAME().getText();
-        symbolTable.enterScope("Comprehension");
-        symbolTable.define(name,SymbolKind.LOOP_VAR,line,false);
+
         Expression list = (Expression) visit(ctx.comp_for().expr().getFirst());
         Expression condition = null;
         if (ctx.comp_for().expr().size() > 1) {
             condition = (Expression) visit(ctx.comp_for().expr().get(1));
         }
-        symbolTable.exitScope();
         ListComprehensionAtom listComprehensionAtom = new ListComprehensionAtom(line, output, name, list, condition);
         return listComprehensionAtom;
     }
@@ -556,14 +538,12 @@ public class PythonVisitor extends PythonParserBaseVisitor {
         int line = ctx.start.getLine();
         Expression output = (Expression) visit(ctx.expr());
         String name = ctx.comp_for().NAME().getText();
-        symbolTable.enterScope("Comprehension");
-        symbolTable.define(name,SymbolKind.VARIABLE,line,false);
+
         Expression list = (Expression) visit(ctx.comp_for().expr().getFirst());
         Expression condition = null;
         if (ctx.comp_for().expr().size() > 1) {
             condition = (Expression) visit(ctx.comp_for().expr().get(1));
         }
-        symbolTable.exitScope();
         GeneratorAtom generatorAtom = new GeneratorAtom(line, output, name, list, condition);
         return generatorAtom;
     }

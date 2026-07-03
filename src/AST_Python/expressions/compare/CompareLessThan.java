@@ -3,9 +3,16 @@ package AST_Python.expressions.compare;
 import AST_Python.CompoundStatement;
 import AST_Python.expressions.Comparision;
 import AST_Python.expressions.NumbericExpression;
+import Visitor.ASTVisitor;
 
 public class CompareLessThan extends Comparision {
     public CompareLessThan(int line, NumbericExpression leftExpression, NumbericExpression rightExpression) {
         super(line, "Compare Less than Statement",leftExpression,rightExpression);
+    }
+    @Override
+    public <T> T accept(ASTVisitor<T> visitor) {
+
+        return visitor.visit(this);
+
     }
 }

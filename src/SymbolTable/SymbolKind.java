@@ -1,5 +1,6 @@
 package SymbolTable;
 public enum SymbolKind {
+    IMPORT,
     FUNCTION,
     PARAMETER,
     VARIABLE,
@@ -7,4 +8,5 @@ public enum SymbolKind {
     CLASS,
     ID,
     BLOCK,
+    ATTRIBUTE
     }

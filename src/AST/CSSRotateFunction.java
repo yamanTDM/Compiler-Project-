@@ -1,5 +1,10 @@
 package AST;
 
+import Visitor.ASTVisitorJinja;
+
+import java.util.Collections;
+import java.util.List;
+
 public class CSSRotateFunction extends CSSFunction {
     private final double angle;
     private final String unit;
@@ -23,5 +28,13 @@ public class CSSRotateFunction extends CSSFunction {
         }
         stringBuilder.append(" )");
         return stringBuilder.toString();
+    }
+    public List<Node> getChildrenSearch() {
+        return Collections.emptyList();
+    }
+    public <T> T accept(ASTVisitorJinja<T> visitor) {
+
+        return visitor.visit(this);
+
     }
 }

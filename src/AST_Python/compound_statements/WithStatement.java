@@ -3,6 +3,7 @@ package AST_Python.compound_statements;
 import AST_Python.Body;
 import AST_Python.CompoundStatement;
 import AST_Python.Expression;
+import Visitor.ASTVisitor;
 
 import javax.print.DocFlavor;
 
@@ -42,5 +43,11 @@ public class WithStatement extends CompoundStatement {
         sb.append(body.print(indentation)).append("\n");
         sb.append(indent).append("}");
         return sb.toString();
+    }
+    @Override
+    public <T> T accept(ASTVisitor<T> visitor) {
+
+        return visitor.visit(this);
+
     }
 }

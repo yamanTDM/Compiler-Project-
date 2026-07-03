@@ -1,5 +1,10 @@
 package AST;
 
+import Visitor.ASTVisitorJinja;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class JinjaFor extends JinjaNode{
     private final JinjaId itemName;
     private final JinjaId collectionName;
@@ -43,5 +48,22 @@ public class JinjaFor extends JinjaNode{
         stringBuilder.append(indent).append("\n");
         stringBuilder.append(indent).append("}\n");
         return stringBuilder.toString();
+    }
+    @Override
+    public List<Node> getChildrenSearch() {
+        List<Node> children = new ArrayList<>();
+
+        if (body != null) {
+            children.add(body);
+        }
+        if (elseBody != null) {
+            children.add(elseBody);
+        }
+        return children;
+    }
+    public <T> T accept(ASTVisitorJinja<T> visitor) {
+
+        return visitor.visit(this);
+
     }
 }

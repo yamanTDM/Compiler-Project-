@@ -2,6 +2,7 @@ package AST_Python.small_statements;
 
 
 import AST_Python.SmallStatement;
+import Visitor.ASTVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,5 +23,10 @@ public class GlobalStatement extends SmallStatement {
     public List<String> getVariables() {
         return variables;
     }
+    @Override
+    public <T> T accept(ASTVisitor<T> visitor) {
 
+        return visitor.visit(this);
+
+    }
 }

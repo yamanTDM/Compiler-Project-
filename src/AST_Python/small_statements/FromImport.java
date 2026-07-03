@@ -1,6 +1,7 @@
 package AST_Python.small_statements;
 
 import AST_Python.expressions.DottedName;
+import Visitor.ASTVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,12 +34,18 @@ public class FromImport extends ImportStatement{
         sb.append(super.print(indent)).append("{\n");
         String indentation = indent + "\t";
         sb.append(indent).append("Module:");
-        sb.append(module.print(indentation)).append("\n");
+        sb.append(module.print("")).append("\n");
         sb.append(indent).append("Attribute: {\n");
         for (String attribute : attribute) {
             sb.append(indentation).append(attribute).append("\n");
         }
         sb.append(indent).append("}\n");
         return sb.toString();
+    }
+    @Override
+    public <T> T accept(ASTVisitor<T> visitor) {
+
+        return visitor.visit(this);
+
     }
 }

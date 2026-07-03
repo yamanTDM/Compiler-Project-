@@ -1,6 +1,7 @@
 package AST_Python.expressions;
 
 import AST_Python.Node;
+import Visitor.ASTVisitor;
 
 public abstract class Comparision extends Node {
     private final NumbericExpression leftExpression;
@@ -30,4 +31,6 @@ public abstract class Comparision extends Node {
         return sb.toString();
 
     }
+    @Override
+    public abstract <T> T accept(ASTVisitor<T> visitor);
 }

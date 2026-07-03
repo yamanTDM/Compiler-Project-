@@ -1,5 +1,7 @@
 package AST_Python;
 
+import Visitor.ASTVisitor;
+
 public class Parameter extends Node{
     private final String parameter;
 
@@ -10,4 +12,11 @@ public class Parameter extends Node{
     public String getParameter() {
         return parameter;
     }
+    @Override
+    public <T> T accept(ASTVisitor<T> visitor) {
+
+        return visitor.visit(this);
+
+    }
+
 }

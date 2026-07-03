@@ -2,6 +2,7 @@ package AST_Python.expressions.atoms;
 
 
 import AST_Python.expressions.Atom;
+import Visitor.ASTVisitor;
 
 public class FloatAtom extends Atom {
     private final float value;
@@ -13,4 +14,11 @@ public class FloatAtom extends Atom {
     public float getValue() {
         return value;
     }
+    @Override
+    public <T> T accept(ASTVisitor<T> visitor) {
+
+        return visitor.visit(this);
+
+    }
+
 }

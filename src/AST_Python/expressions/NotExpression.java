@@ -1,6 +1,7 @@
 package AST_Python.expressions;
 
 import AST_Python.Expression;
+import Visitor.ASTVisitor;
 
 public class NotExpression extends Expression {
     private final Expression expression;
@@ -22,5 +23,11 @@ public class NotExpression extends Expression {
         sb.append(expression.print(indentation)).append("\n");
         sb.append(indent).append("}");
         return sb.toString();
+    }
+    @Override
+    public <T> T accept(ASTVisitor<T> visitor) {
+
+        return visitor.visit(this);
+
     }
 }

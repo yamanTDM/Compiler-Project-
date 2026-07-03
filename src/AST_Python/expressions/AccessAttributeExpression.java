@@ -1,6 +1,8 @@
 package AST_Python.expressions;
 
 
+import Visitor.ASTVisitor;
+
 public class AccessAttributeExpression extends NumbericExpression {
     private final NumbericExpression object;
     private final String name;
@@ -26,6 +28,12 @@ public class AccessAttributeExpression extends NumbericExpression {
         sb.append(indentation).append("attribute :").append(name).append("\n");
         sb.append(indent).append("}");
         return sb.toString();
+
+    }
+    @Override
+    public <T> T accept(ASTVisitor<T> visitor) {
+
+        return visitor.visit(this);
 
     }
 }

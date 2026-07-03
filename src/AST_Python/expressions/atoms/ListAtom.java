@@ -2,6 +2,7 @@ package AST_Python.expressions.atoms;
 
 import AST_Python.Expression;
 import AST_Python.expressions.Atom;
+import Visitor.ASTVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,5 +31,12 @@ public class ListAtom extends Atom {
         }
         sb.append(indent).append("}");
         return sb.toString();
+    }
+
+    @Override
+    public <T> T accept(ASTVisitor<T> visitor) {
+
+        return visitor.visit(this);
+
     }
 }

@@ -1,5 +1,7 @@
 package AST;
 
+import Visitor.ASTVisitorJinja;
+
 public abstract class BodyNode extends Node {
     public BodyNode(int line,String name)
     {
@@ -9,4 +11,6 @@ public abstract class BodyNode extends Node {
 
         return "";
     }
+    public abstract <T> T accept(ASTVisitorJinja<T> visitor);
+
 }

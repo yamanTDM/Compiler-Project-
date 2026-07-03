@@ -1,6 +1,7 @@
 package AST_Python.expressions;
 
 import AST_Python.Expression;
+import Visitor.ASTVisitor;
 
 public class AssignExpression extends Expression {
     private final String name;
@@ -28,5 +29,11 @@ public class AssignExpression extends Expression {
         sb.append(value.print(indentation)).append("\n");
         sb.append(indent).append("}");
         return sb.toString();
+    }
+    @Override
+    public <T> T accept(ASTVisitor<T> visitor) {
+
+        return visitor.visit(this);
+
     }
 }

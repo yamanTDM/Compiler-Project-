@@ -1,6 +1,7 @@
 package AST_Python.expressions;
 
 import AST_Python.Expression;
+import Visitor.ASTVisitor;
 
 public class AccessSubscriptExpression extends NumbericExpression{
     private final NumbericExpression object;
@@ -27,6 +28,12 @@ public class AccessSubscriptExpression extends NumbericExpression{
         sb.append(index.print(indentation)).append("\n");
         sb.append(indent).append("}");
         return sb.toString();
+
+    }
+    @Override
+    public <T> T accept(ASTVisitor<T> visitor) {
+
+        return visitor.visit(this);
 
     }
 }

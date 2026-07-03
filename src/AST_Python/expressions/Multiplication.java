@@ -1,5 +1,7 @@
 package AST_Python.expressions;
 
+import Visitor.ASTVisitor;
+
 public class Multiplication extends NumbericExpression {
     private final NumbericExpression leftExpression;
     private final NumbericExpression rightExpression;
@@ -26,5 +28,11 @@ public class Multiplication extends NumbericExpression {
         sb.append(rightExpression.print(indentation)).append("\n");
         sb.append(indent).append("}");
         return sb.toString();
+    }
+    @Override
+    public <T> T accept(ASTVisitor<T> visitor) {
+
+        return visitor.visit(this);
+
     }
 }

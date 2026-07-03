@@ -3,6 +3,7 @@ package AST_Python.compound_statements;
 import AST_Python.Expression;
 import AST_Python.Node;
 import AST_Python.expressions.DottedName;
+import Visitor.ASTVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,4 +44,13 @@ public class Decorator extends Node {
         sb.append(indent).append("}");
         return sb.toString();
     }
+    @Override
+    public <T> T accept(ASTVisitor<T> visitor) {
+
+        return visitor.visit(this);
+
+    }
+
+
+
 }

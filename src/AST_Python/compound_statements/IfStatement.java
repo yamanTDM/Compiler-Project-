@@ -3,6 +3,7 @@ package AST_Python.compound_statements;
 import AST_Python.Body;
 import AST_Python.CompoundStatement;
 import AST_Python.Expression;
+import Visitor.ASTVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +64,12 @@ public class IfStatement extends CompoundStatement {
         }
         sb.append(indent).append("}");
         return sb.toString();
+
+    }
+    @Override
+    public <T> T accept(ASTVisitor<T> visitor) {
+
+        return visitor.visit(this);
 
     }
 }

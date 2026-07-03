@@ -1,6 +1,7 @@
 package AST_Python.small_statements;
 
 import AST_Python.expressions.DottedName;
+import Visitor.ASTVisitor;
 
 public class PlainImport extends ImportStatement {
     private final DottedName module;
@@ -23,5 +24,11 @@ public class PlainImport extends ImportStatement {
         sb.append(module.print(indentaion)).append("\n");
         sb.append(indent).append("}");
         return sb.toString();
+    }
+    @Override
+    public <T> T accept(ASTVisitor<T> visitor) {
+
+        return visitor.visit(this);
+
     }
 }

@@ -10,7 +10,8 @@ app = Flask(__name__)
 # -----------------------
 UPLOAD_FOLDER = "static/uploads"
 DATA_FILE = "products.json"
-
+x = 3
+z = True
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 

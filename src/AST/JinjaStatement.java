@@ -1,6 +1,9 @@
 package AST;
 
+import Visitor.ASTVisitorJinja;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class JinjaStatement extends JinjaNode {
@@ -28,5 +31,12 @@ public class JinjaStatement extends JinjaNode {
 
         return sb.toString();
     }
+    public List<Node> getChildrenSearch() {
+        return Collections.emptyList();
+    }
+    public <T> T accept(ASTVisitorJinja<T> visitor) {
 
+        return visitor.visit(this);
+
+    }
 }

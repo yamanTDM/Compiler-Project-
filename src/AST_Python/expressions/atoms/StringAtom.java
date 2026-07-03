@@ -1,6 +1,7 @@
 package AST_Python.expressions.atoms;
 
 import AST_Python.expressions.Atom;
+import Visitor.ASTVisitor;
 
 public class StringAtom extends Atom {
     private final String value;
@@ -11,5 +12,11 @@ public class StringAtom extends Atom {
 
     public String getValue() {
         return value;
+    }
+    @Override
+    public <T> T accept(ASTVisitor<T> visitor) {
+
+        return visitor.visit(this);
+
     }
 }

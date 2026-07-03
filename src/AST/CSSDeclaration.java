@@ -1,6 +1,9 @@
 package AST;
 
+import Visitor.ASTVisitorJinja;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CSSDeclaration extends Node{
@@ -34,5 +37,13 @@ public class CSSDeclaration extends Node{
             stringBuilder.append(term.toString()).append(" ");
         }
         return stringBuilder.toString();
+    }
+    public List<Node> getChildrenSearch() {
+        return Collections.emptyList();
+    }
+    public <T> T accept(ASTVisitorJinja<T> visitor) {
+
+        return visitor.visit(this);
+
     }
 }

@@ -1,6 +1,7 @@
 package AST_Python.expressions;
 
 import AST_Python.Expression;
+import Visitor.ASTVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.List;
 public class AndExpression extends Expression {
     private final List<Expression> expressions;
     public AndExpression(int line) {
-        super(line,"Or Expression");
+        super(line,"And Expression");
         this.expressions = new ArrayList<>();
     }
     public void addExpression(Expression expression){
@@ -28,5 +29,11 @@ public class AndExpression extends Expression {
         }
         sb.append(indent).append("}");
         return sb.toString();
+    }
+    @Override
+    public <T> T accept(ASTVisitor<T> visitor) {
+
+        return visitor.visit(this);
+
     }
 }

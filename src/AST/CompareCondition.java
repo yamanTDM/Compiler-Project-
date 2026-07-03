@@ -1,5 +1,10 @@
 package AST;
 
+import Visitor.ASTVisitorJinja;
+
+import java.util.Collections;
+import java.util.List;
+
 public class CompareCondition extends Condition {
     private final String leftValue;
     private final String operator;
@@ -28,5 +33,13 @@ public class CompareCondition extends Condition {
         stringBuilder.append(operator).append(" ");
         stringBuilder.append(rightValue).append(" ");
         return stringBuilder.toString();
+    }
+    public List<Node> getChildrenSearch() {
+        return Collections.emptyList();
+    }
+    public <T> T accept(ASTVisitorJinja<T> visitor) {
+
+        return visitor.visit(this);
+
     }
 }

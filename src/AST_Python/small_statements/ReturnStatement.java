@@ -2,6 +2,7 @@ package AST_Python.small_statements;
 
 import AST_Python.Expression;
 import AST_Python.SmallStatement;
+import Visitor.ASTVisitor;
 
 public class ReturnStatement extends SmallStatement {
     private final Expression expression;
@@ -24,5 +25,11 @@ public class ReturnStatement extends SmallStatement {
         }
         sb.append(indent).append("}");
         return sb.toString();
+    }
+    @Override
+    public <T> T accept(ASTVisitor<T> visitor) {
+
+        return visitor.visit(this);
+
     }
 }

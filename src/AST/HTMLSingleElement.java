@@ -1,6 +1,9 @@
 package AST;
 
+import Visitor.ASTVisitorJinja;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class HTMLSingleElement extends HTMLNode{
@@ -44,7 +47,15 @@ public class HTMLSingleElement extends HTMLNode{
         stringBuilder.append(indent).append("}\n");
 
         return stringBuilder.toString();
-    }
 
+    }
+    public List<Node> getChildrenSearch() {
+        return Collections.emptyList();
+    }
+    public <T> T accept(ASTVisitorJinja<T> visitor) {
+
+        return visitor.visit(this);
+
+    }
 
 }

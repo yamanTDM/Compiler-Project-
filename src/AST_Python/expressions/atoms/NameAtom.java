@@ -1,6 +1,7 @@
 package AST_Python.expressions.atoms;
 
 import AST_Python.expressions.Atom;
+import Visitor.ASTVisitor;
 
 public class NameAtom extends Atom {
     private final String name;
@@ -12,5 +13,12 @@ public class NameAtom extends Atom {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public <T> T accept(ASTVisitor<T> visitor) {
+
+        return visitor.visit(this);
+
     }
 }

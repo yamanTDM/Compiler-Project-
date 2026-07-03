@@ -2,6 +2,7 @@ package AST_Python.small_statements;
 
 import AST_Python.Expression;
 import AST_Python.SmallStatement;
+import Visitor.ASTVisitor;
 
 public class AugmentedMinus extends SmallStatement {
     private final Expression leftExpression;
@@ -30,5 +31,11 @@ public class AugmentedMinus extends SmallStatement {
         sb.append(rightExpression.print(indentation)).append("\n");
         sb.append(indent).append("}");
         return sb.toString();
+    }
+    @Override
+    public <T> T accept(ASTVisitor<T> visitor) {
+
+        return visitor.visit(this);
+
     }
 }
