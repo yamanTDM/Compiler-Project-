@@ -1,0 +1,19 @@
+=== Context extraction (Python) ===
+  -> call to 'Flask(...)' is outside the resolver's whitelist; treated as unresolved.
+UNRESOLVED  app (line 6): right-hand side is not a literal and could not be reduced by the whitelisted-builtin resolver.
+RESOLVED    UPLOAD_FOLDER = static/uploads (line 11)
+RESOLVED    DATA_FILE = products.json (line 12)
+RESOLVED    x = 3 (line 13)
+RESOLVED    products = [{id=1, name=Burger, price=2145121.0, details=cheese burger, image=double-che... (line 34)
+RESOLVED    next_id = 5 (line 37)
+
+=== HTML generation ===
+Fan-out: generated detail_1.html with product = products[id=1]
+Fan-out: generated detail_2.html with product = products[id=2]
+Fan-out: generated detail_3.html with product = products[id=3]
+Fan-out: generated detail_4.html with product = products[id=4]
+
+=== Pass-through files ===
+Copied pass-through file unchanged: python.txt
+Pass-through file not found, skipped: Tests\style.css
+Pass-through file not found, skipped: Tests\script.js

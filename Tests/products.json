@@ -1,0 +1,30 @@
+[
+    {
+        "id": 1,
+        "name": "Burger",
+        "price": 2145121.0,
+        "details": "cheese burger",
+        "image": "double-cheeseburger-ss-NEW.png"
+    },
+    {
+        "id": 2,
+        "name": "fries",
+        "price": 1254213.0,
+        "details": "crispy fries\r\n",
+        "image": "french_fries.png"
+    },
+    {
+        "id": 3,
+        "name": "chicken salad",
+        "price": 2000.0,
+        "details": "chicken salad",
+        "image": "greek-salmon-bowl-f681500cbe054bb1adb607ff55094075.jpeg"
+    },
+    {
+        "id": 4,
+        "name": "pasta",
+        "price": 30000.0,
+        "details": "pasta dish\r\n",
+        "image": "EXPS_TOHD24_167133_SarahTramonte_6.jpg"
+    }
+]

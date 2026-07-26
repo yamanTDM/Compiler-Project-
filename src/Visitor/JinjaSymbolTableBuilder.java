@@ -13,6 +13,12 @@ public class JinjaSymbolTableBuilder implements ASTVisitorJinja<Void> {
 
     public JinjaSymbolTableBuilder(List<Symbol> pythonSymbols) {
         this.pythonSymbols = pythonSymbols;
+        if (pythonSymbols != null) {
+            for (Symbol sym : pythonSymbols) {
+                symbolTable.defineInGlobal(sym.getName(), sym.getType(), sym.getValue(),
+                        sym.getKind(), sym.getLine(), true);
+            }
+        }
     }
     public SymbolTable getSymbolTable() {
         return symbolTable;
@@ -89,8 +95,8 @@ public class JinjaSymbolTableBuilder implements ASTVisitorJinja<Void> {
 
     @Override
     public Void visit(JinjaAssign node) {
-        node.getName().accept(this);
         node.getValue().accept(this);
+        symbolTable.define(node.getName().getFullName(), null, null, SymbolKind.VARIABLE, node.getLine(), false);
         return null;
     }
 

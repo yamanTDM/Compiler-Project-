@@ -200,10 +200,24 @@ public class JinjaHtmlVisitor extends JinjaHtmlParserBaseVisitor {
     public CSSRule visitCssRule(JinjaHtmlParser.CssRuleContext ctx) {
         int line = ctx.start.getLine();
         CSSRule cssRule = new CSSRule(line);
-        for (int i = 0; i < ctx.selectorList().selector().size(); i++) {
-            CSSSelector selector = (CSSSelector) visit(ctx.selectorList().selector().get(i));
-            cssRule.addSelector(selector);
+
+        JinjaHtmlParser.SelectorListContext selectorListCtx = ctx.selectorList();
+        int selectorIndex = 0;
+        boolean commaSeenBeforeNext = false;
+        for (int c = 0; c < selectorListCtx.getChildCount(); c++) {
+            org.antlr.v4.runtime.tree.ParseTree child = selectorListCtx.getChild(c);
+            if (child instanceof org.antlr.v4.runtime.tree.TerminalNode term
+                    && term.getSymbol().getType() == JinjaHtmlParser.CSS_COMMA) {
+                commaSeenBeforeNext = true;
+            } else if (child instanceof JinjaHtmlParser.SelectorContext) {
+                CSSSelector selector = (CSSSelector) visit(child);
+                boolean commaBefore = (selectorIndex == 0) || commaSeenBeforeNext;
+                cssRule.addSelector(selector, commaBefore);
+                selectorIndex++;
+                commaSeenBeforeNext = false;
+            }
         }
+
         if (ctx.declarationList() != null) {
             for (int i = 0; i < ctx.declarationList().declaration().size(); i++) {
                 CSSDeclaration declaration = visitDeclaration(ctx.declarationList().declaration().get(i));
@@ -252,9 +266,21 @@ public class JinjaHtmlVisitor extends JinjaHtmlParserBaseVisitor {
         int line = ctx.start.getLine();
         CSSDeclaration declaration = new CSSDeclaration(line, ctx.CSS_NAME().getText());
 
-        for (int i = 0; i < ctx.value().cssTerm().size(); i++) {
-            CSSTerm term = (CSSTerm) visit(ctx.value().cssTerm().get(i));
-            declaration.addTerm(term);
+        JinjaHtmlParser.ValueContext valueCtx = ctx.value();
+        int termIndex = 0;
+        boolean commaSeenBeforeNext = false;
+        for (int c = 0; c < valueCtx.getChildCount(); c++) {
+            org.antlr.v4.runtime.tree.ParseTree child = valueCtx.getChild(c);
+            if (child instanceof org.antlr.v4.runtime.tree.TerminalNode term
+                    && term.getSymbol().getType() == JinjaHtmlParser.CSS_COMMA) {
+                commaSeenBeforeNext = true;
+            } else if (child instanceof JinjaHtmlParser.CssTermContext) {
+                CSSTerm cssTerm = (CSSTerm) visit(child);
+                boolean commaBefore = (termIndex != 0) && commaSeenBeforeNext;
+                declaration.addTerm(cssTerm, commaBefore);
+                termIndex++;
+                commaSeenBeforeNext = false;
+            }
         }
 
         return declaration;

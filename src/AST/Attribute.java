@@ -20,6 +20,13 @@ public class Attribute extends Node{
         this.value = value;
     }
 
+    public String getName() {
+        return name;
+    }
+    public AttributeValue getValue() {
+        return value;
+    }
+
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();

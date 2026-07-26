@@ -1,0 +1,11 @@
+=== Python semantic check ===
+No errors found.
+
+=== Jinja semantic check: index.html ===
+No errors found.
+
+=== Jinja semantic check: add.html ===
+No errors found.
+
+=== Jinja semantic check: detail.html ===
+No errors found.

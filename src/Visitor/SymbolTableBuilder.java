@@ -142,9 +142,7 @@ public class SymbolTableBuilder implements ASTVisitor<Void> {
                     addDictAttributes(globalSym, dictAtom);
                 }
             }
-            for (Symbol symbol: localSym.getAttributes()){
-                System.out.println(localSym.getName() + "." +symbol.getName());
-            }
+
         } else {
             lhs.accept(this);
         }
@@ -152,6 +150,7 @@ public class SymbolTableBuilder implements ASTVisitor<Void> {
     }
 
     private void addDictAttributes(Symbol parent, DictionaryAtom dictAtom) {
+        System.out.println(parent.getName() + " : " + parent.getLine());
 
         for (DictionaryEntry entry : dictAtom.getEntries()) {
             if (entry.getKey() instanceof StringAtom keyAtom) {
@@ -292,7 +291,13 @@ public class SymbolTableBuilder implements ASTVisitor<Void> {
 
                     if (pythonSideValue instanceof NameAtom valueRef) {
                         Symbol pythonSymbol = symbolTable.lookup(valueRef.getName());
+                        System.out.println(pythonSymbol.getName() + " : " + pythonSymbol.getLine());
+
                         Symbol newSymbol = new Symbol(jinjaSideName,pythonSymbol.getType(),pythonSymbol.getValue(),pythonSymbol.getKind(),pythonSymbol.getLine(), pythonSymbol.isGlobal());
+                        for (Symbol attribute : pythonSymbol.getAttributes()) {
+                            System.out.println(attribute.getName());
+                            newSymbol.addAttribute(attribute);
+                        }
                         symbols.add(newSymbol);
                     }
                 }
