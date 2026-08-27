@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,33 +19,85 @@ public class GenerationRunner {
     private final Path compilerOutputDir;
 
     public GenerationRunner(Path projectRoot) throws IOException {
-        this.outputDir = projectRoot.resolve("output");
-        this.compilerOutputDir = projectRoot.resolve("compiler_output");
+        Path normalizedRoot = projectRoot.toAbsolutePath().normalize();
+        this.outputDir = normalizedRoot.resolve("output");
+        this.compilerOutputDir = normalizedRoot.resolve("compiler_output");
         Files.createDirectories(outputDir);
         Files.createDirectories(compilerOutputDir);
     }
 
-    /** Writes one generated HTML page. */
-    public void writeGeneratedPage(String templateFileName, String html) throws IOException {
-        Files.writeString(outputDir.resolve(templateFileName), html, StandardCharsets.UTF_8);
+    public Path getOutputDir() {
+        return outputDir;
     }
 
-    /** Copies a pass-through support file (app.py, style.css, script.js) unchanged, if it exists. */
-    public void copyPassThrough(Path sourceFile, List<String> log) throws IOException {
-        if (sourceFile == null || !Files.exists(sourceFile)) {
-            if (sourceFile != null) {
-                log.add("Pass-through file not found, skipped: " + sourceFile);
-            }
-            return;
+    public Path getCompilerOutputDir() {
+        return compilerOutputDir;
+    }
+
+
+    public void resetOutputDirectories() throws IOException {
+        recreateGeneratedDirectory(outputDir, "output");
+        recreateGeneratedDirectory(compilerOutputDir, "compiler_output");
+    }
+
+    private static void recreateGeneratedDirectory(Path directory, String requiredName) throws IOException {
+        Path normalized = directory.toAbsolutePath().normalize();
+        if (normalized.getFileName() == null
+                || !requiredName.equals(normalized.getFileName().toString())) {
+            throw new IOException("Refusing to clean an unsafe generated directory: " + normalized);
         }
-        Files.copy(sourceFile, outputDir.resolve(sourceFile.getFileName()), StandardCopyOption.REPLACE_EXISTING);
-        log.add("Copied pass-through file unchanged: " + sourceFile.getFileName());
+        if (Files.exists(normalized)) {
+            try (var paths = Files.walk(normalized)) {
+                for (Path path : paths.sorted(Comparator.reverseOrder()).toList()) {
+                    Files.delete(path);
+                }
+            }
+        }
+        Files.createDirectories(normalized);
+    }
+
+    public void writeGeneratedPage(String templateFileName, String html) throws IOException {
+        Path target = safeOutputPath(templateFileName);
+        if (target.getParent() != null) Files.createDirectories(target.getParent());
+        Files.writeString(target, html, StandardCharsets.UTF_8);
+    }
+
+
+    public void copyInputTree(Path inputDir, List<String> log) throws IOException {
+        Path normalizedInput = inputDir.toAbsolutePath().normalize();
+        try (var paths = Files.walk(normalizedInput)) {
+            for (Path source : paths.sorted().toList()) {
+                Path relative = normalizedInput.relativize(source);
+                if (relative.toString().isEmpty()) continue;
+                Path target = outputDir.resolve(relative).normalize();
+                if (!target.startsWith(outputDir)) {
+                    throw new IOException("Unsafe input path while copying: " + relative);
+                }
+                if (Files.isDirectory(source)) {
+                    Files.createDirectories(target);
+                } else if (Files.isRegularFile(source)) {
+                    if (target.getParent() != null) Files.createDirectories(target.getParent());
+                    Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING,
+                            StandardCopyOption.COPY_ATTRIBUTES);
+                    log.add(relative.toString().replace('\\', '/'));
+                }
+            }
+        }
+    }
+
+
+    public void ensurePythonAppAlias(Path pythonSource, List<String> log) throws IOException {
+        if (pythonSource.getFileName().toString().equalsIgnoreCase("app.py")) return;
+        Path target = safeOutputPath("app.py");
+        Files.copy(pythonSource, target, StandardCopyOption.REPLACE_EXISTING,
+                StandardCopyOption.COPY_ATTRIBUTES);
+        log.add("app.py (unchanged alias of " + pythonSource.getFileName() + ")");
     }
 
     public void writePythonAst(String rawPrint) throws IOException {
         String clean = stripAnsi(rawPrint);
         String json = "{\n  \"ast_dump\": \"" + MiniJson.escape(clean) + "\"\n}\n";
-        Files.writeString(compilerOutputDir.resolve("ast_python.json"), json, StandardCharsets.UTF_8);
+        writeReport("ast_python.json", json);
     }
 
     public void writeJinjaAst(Map<String, String> rawPrintByTemplate) throws IOException {
@@ -57,7 +110,7 @@ public class GenerationRunner {
             sb.append('\n');
         }
         sb.append("}\n");
-        Files.writeString(compilerOutputDir.resolve("ast_jinja.json"), sb.toString(), StandardCharsets.UTF_8);
+        writeReport("ast_jinja.json", sb.toString());
     }
 
     public void writeSemanticReport(List<String> pythonErrors, Map<String, List<String>> jinjaErrorsByTemplate) throws IOException {
@@ -76,13 +129,13 @@ public class GenerationRunner {
                 for (String e : entry.getValue()) sb.append(e).append('\n');
             }
         }
-        Files.writeString(compilerOutputDir.resolve("semantic_report.txt"), sb.toString(), StandardCharsets.UTF_8);
+        writeReport("semantic_report.txt", sb.toString());
     }
 
     public void writeGenerationLog(List<String> lines) throws IOException {
         StringBuilder sb = new StringBuilder();
         for (String line : lines) sb.append(line).append('\n');
-        Files.writeString(compilerOutputDir.resolve("generation_log.txt"), sb.toString(), StandardCharsets.UTF_8);
+        writeReport("generation_log.txt", sb.toString());
     }
 
     private static String stripAnsi(String s) {
@@ -91,5 +144,17 @@ public class GenerationRunner {
 
     public static Map<String, Object> newOrderedMap() {
         return new LinkedHashMap<>();
+    }
+
+    private Path safeOutputPath(String relativeName) throws IOException {
+        Path target = outputDir.resolve(relativeName).normalize();
+        if (!target.startsWith(outputDir)) {
+            throw new IOException("Generated path escapes output directory: " + relativeName);
+        }
+        return target;
+    }
+
+    private void writeReport(String fileName, String content) throws IOException {
+        Files.writeString(compilerOutputDir.resolve(fileName), content, StandardCharsets.UTF_8);
     }
 }

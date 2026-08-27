@@ -56,7 +56,9 @@ public class JinjaSymbolTableBuilder implements ASTVisitorJinja<Void> {
 
     @Override
     public Void visit(Attribute node) {
-
+        if (node.getValue() != null) {
+            node.getValue().accept(this);
+        }
         return null;
     }
 
@@ -124,12 +126,12 @@ public class JinjaSymbolTableBuilder implements ASTVisitorJinja<Void> {
 
     @Override
     public Void visit(JinjaText node) {
-        return null; // leaf, literal string
+        return null;
     }
 
     @Override
     public Void visit(Text node) {
-        return null; // leaf, literal HTML text
+        return null;
     }
 
     @Override

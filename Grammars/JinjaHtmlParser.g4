@@ -83,7 +83,6 @@ cssTerm
     | CSS_NAME                       #NameTerm
     | hexNum                         #HexTerm
     | functions                      #FunctionTerm
-
     ;
 functions
 : CSS_HSL CSS_LP cssNum CSS_COMMA cssNum CSS_COMMA cssNum CSS_RP                               #HSLFunction

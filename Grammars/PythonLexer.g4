@@ -1,28 +1,9 @@
-// ═══════════════════════════════════════════════════════════════════════════
-//  PythonLexer.g4
-//
-//  INDENT / DEDENT are NOT emitted here — they are injected by
-//  PythonIndentLexer.java, which overrides nextToken() and tracks an
-//  indent-level stack.
-//
-//  KEY DESIGN CHOICE:
-//    NEWLINE matches ONLY the line-terminator character(s).
-//    It does NOT consume the leading whitespace of the next line.
-//    Leading whitespace is handled by WS (skipped), so ANTLR's built-in
-//    charPositionInLine for the first real token on each line gives
-//    the exact indent column that PythonIndentLexer needs.
-// ═══════════════════════════════════════════════════════════════════════════
 
 lexer grammar PythonLexer;
 
-// INDENT and DEDENT are virtual tokens emitted by PythonIndentLexer.java
 tokens { INDENT, DEDENT }
 
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  Keywords  (must come BEFORE the NAME rule)
-// ─────────────────────────────────────────────────────────────────────────────
-
+//  Keywords
 FROM        : 'from'   ;
 IMPORT      : 'import' ;
 DEF         : 'def'    ;
@@ -44,15 +25,12 @@ FALSE       : 'False'  ;
 PASS        : 'pass'   ;
 
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  Operators  (longer/higher-priority alternatives listed first)
-// ─────────────────────────────────────────────────────────────────────────────
 
 // Augmented assignment
 PLUS_ASSIGN  : '+=' ;
 MINUS_ASSIGN : '-=' ;
 
-// Comparison  (two-char before one-char)
+// Comparison
 EQ           : '==' ;
 NEQ          : '!=' ;
 LEQ          : '<=' ;
@@ -70,9 +48,7 @@ STAR         : '*'  ;
 SLASH        : '/'  ;
 
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  Delimiters / Punctuation
-// ─────────────────────────────────────────────────────────────────────────────
+// Punctuation
 
 LPAREN  : '(' ;
 RPAREN  : ')' ;
@@ -86,10 +62,7 @@ COLON   : ':' ;
 AT      : '@' ;
 
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  String Literals
-//  Covers plain, f-, r-, b-strings and triple-quoted variants.
-// ─────────────────────────────────────────────────────────────────────────────
+//  String
 
 STRING
     : STRING_PREFIX? SHORT_STRING
@@ -119,9 +92,7 @@ fragment LONG_CHAR      : ~'\\' ;
 fragment STRING_ESC_SEQ : '\\' . ;
 
 
-// ─────────────────────────────────────────────────────────────────────────────
 //  Numeric Literals
-// ─────────────────────────────────────────────────────────────────────────────
 
 INTEGER   : DIGIT+                       ;
 FLOAT_NUM : DIGIT+ '.' DIGIT*
@@ -131,27 +102,17 @@ FLOAT_NUM : DIGIT+ '.' DIGIT*
 fragment DIGIT : [0-9] ;
 
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  Identifiers  (after all keyword rules)
-// ─────────────────────────────────────────────────────────────────────────────
+//  Identifiers
 
 NAME : [a-zA-Z_][a-zA-Z0-9_]* ;
 
 
-// ─────────────────────────────────────────────────────────────────────────────
 //  Newlines, Whitespace, Comments
-// ─────────────────────────────────────────────────────────────────────────────
 
-// NEWLINE = the bare line terminator only.
-// PythonIndentLexer intercepts these and emits INDENT / DEDENT as needed.
 NEWLINE : ( '\r'? '\n' | '\r' | '\f' ) ;
 
-// Intra-line spaces/tabs are skipped; ANTLR still counts them for
-// charPositionInLine, which PythonIndentLexer reads to get the indent level.
 WS : [ \t]+ -> skip ;
 
-// Single-line comments are discarded entirely.
 COMMENT : '#' ~[\r\n\f]* -> skip ;
 
-// Explicit line continuation: backslash + newline → skip both.
 LINE_JOINING : '\\' ( '\r'? '\n' | '\r' | '\f' ) -> skip ;

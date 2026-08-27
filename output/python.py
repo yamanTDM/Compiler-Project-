@@ -1,0 +1,96 @@
+from flask import Flask, render_template, request, redirect, url_for
+import os
+import json
+from werkzeug.utils import secure_filename
+
+app = Flask(__name__)
+
+# -----------------------
+# Config
+# -----------------------
+UPLOAD_FOLDER = "static/uploads"
+DATA_FILE = "products.json"
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# -----------------------
+# Load / Save functions
+# -----------------------
+
+def load_products():
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, "r") as f:
+            return json.load(f)
+    return []
+
+
+def save_products(products):
+    with open(DATA_FILE, "w") as f:
+        json.dump(products, f, indent=4)
+
+# -----------------------
+# Initialize data
+# -----------------------
+products = load_products()
+
+# auto-set next_id
+next_id = max([p["id"] for p in products], default=0) + 1
+
+# -----------------------
+# Routes
+# -----------------------
+@app.route("/")
+def index():
+    return render_template("index.html", products=products)
+
+
+@app.route("/add", methods=["GET", "POST"])
+def add():
+    global next_id
+
+    if request.method == "POST":
+        file = request.files["image"]
+
+        filename = ""
+        if file and file.filename:
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+
+        product = {
+            "id": next_id,
+            "name": request.form["name"],
+            "price": request.form["price"],
+            "description": request.form["description"],
+            "image": filename
+        }
+
+        products.append(product)
+        save_products(products)   # ✅ save to file
+
+        next_id += 1
+        return redirect(url_for("index"))
+
+    return render_template("add.html")
+
+
+@app.route("/product/<int:id>")
+def detail(id):
+    product = next((p for p in products if p["id"] == id), None)
+    return render_template("detail.html", product=product)
+
+
+@app.route("/delete/<int:id>", methods=["POST"])
+def delete(id):
+    global products
+    products = [p for p in products if p["id"] != id]
+
+    save_products(products)   # ✅ update file
+
+    return redirect(url_for("index"))
+
+
+# -----------------------
+# Run
+# -----------------------
+if __name__ == "__main__":
+    app.run(debug=True)

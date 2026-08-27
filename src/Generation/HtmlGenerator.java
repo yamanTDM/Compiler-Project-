@@ -64,8 +64,9 @@ public class HtmlGenerator {
         this.routes = routes;
     }
 
-    /** Renders one fully-resolved (post-inheritance) template into an HTML string. */
     public String generate(Program page, Map<String, Object> context, String templateName) {
+
+
         StringBuilder sb = new StringBuilder();
         for (BodyNode node : page.getBodyNodes()) {
             renderNode(node, context, sb, templateName);
@@ -73,9 +74,6 @@ public class HtmlGenerator {
         return sb.toString();
     }
 
-    // -----------------------------------------------------------------
-    // Body / structural nodes
-    // -----------------------------------------------------------------
 
     private void renderNode(Node node, Map<String, Object> scope, StringBuilder out, String templateName) {
         if (node instanceof Text t) {
@@ -112,21 +110,17 @@ public class HtmlGenerator {
                 if (part instanceof JinjaAssign assign) {
                     scope.put(assign.getName().getFullName(), evalJinjaExpr(assign.getValue(), scope, templateName));
                 }
-                // any other bare statement expression produces no output
             }
 
         } else if (node instanceof JinjaInheritance inh) {
-            // Shouldn't normally appear in a resolved base tree, but render defensively.
             for (BodyNode child : inh.getBodys()) renderNode(child, scope, out, templateName);
 
         } else if (node instanceof JinjaSuperBlock) {
-            // TemplateResolver already splices super() content in; nothing to do here.
 
         } else if (node instanceof CSSBody cssBody) {
             renderCssBody(cssBody, out);
 
         }
-        // else: unknown/unsupported node kind -> silently produces no output
     }
 
     private void renderFor(JinjaFor forNode, Map<String, Object> scope, StringBuilder out, String templateName) {
@@ -170,7 +164,7 @@ public class HtmlGenerator {
     private void renderAttribute(Attribute a, Map<String, Object> scope, StringBuilder out, String templateName) {
         out.append(' ').append(a.getName());
         AttributeValue value = a.getValue();
-        if (value == null) return; // boolean attribute, e.g. "required"
+        if (value == null) return;
 
         String rendered;
         if (value instanceof AttributeString s) {
@@ -187,9 +181,6 @@ public class HtmlGenerator {
         out.append("=\"").append(htmlAttrEscape(rendered)).append('"');
     }
 
-    // -----------------------------------------------------------------
-    // Jinja expression evaluation ({{ ... }}, attribute values, conditions)
-    // -----------------------------------------------------------------
 
     private Object evalJinjaExpr(JinjaExpr expr, Map<String, Object> scope, String templateName) {
         if (expr instanceof JinjaId id) {
@@ -287,14 +278,22 @@ public class HtmlGenerator {
         return resolveDotted(trimmed, scope);
     }
 
-    /** Resolves a dotted path like "product.name" against the scope map. */
     private Object resolveDotted(String path, Map<String, Object> scope) {
         String[] parts = path.split("\\.");
         if (!scope.containsKey(parts[0])) return UNRESOLVED;
         Object current = scope.get(parts[0]);
         for (int i = 1; i < parts.length; i++) {
             if (!(current instanceof Map<?, ?> m)) return UNRESOLVED;
-            current = m.get(parts[i]);
+            String key = parts[i];
+            if (m.containsKey(key)) {
+                current = m.get(key);
+            } else if ("description".equals(key) && m.containsKey("details")) {
+                current = m.get("details");
+            } else if ("details".equals(key) && m.containsKey("description")) {
+                current = m.get("description");
+            } else {
+                return UNRESOLVED;
+            }
         }
         return current == null ? null : current;
     }
@@ -315,9 +314,7 @@ public class HtmlGenerator {
         return htmlEscape(s).replace("\"", "&quot;");
     }
 
-    // -----------------------------------------------------------------
-    // Minimal CSS regeneration for <style> blocks parsed into CSS AST
-    // -----------------------------------------------------------------
+
 
     private void renderCssBody(CSSBody body, StringBuilder out) {
         out.append("<style>\n");
@@ -361,7 +358,6 @@ public class HtmlGenerator {
         return "";
     }
 
-    /** Formats a CSS number without a spurious trailing ".0" (15.0 -> "15", 0.2 stays "0.2"). */
     private static String formatCssNumber(double d) {
         if (d == Math.rint(d) && !Double.isInfinite(d)) return String.valueOf((long) d);
         return String.valueOf(d);

@@ -4,13 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * One entry in the symbol table.
- * <p>
- * For FUNCTION symbols the {@code decorators} list holds every decorator
- * string (e.g. "@app.route(\"/\", methods=[\"GET\",\"POST\"])") in
- * declaration order.  For all other kinds the list is empty.
- */
 public class Symbol {
 
     private final String name;
@@ -33,7 +26,6 @@ public class Symbol {
         this.attributes = new ArrayList<>();
     }
 
-    // ── accessors ────────────────────────────────────────────────────────────
 
     public String getName() {
         return name;
@@ -68,9 +60,6 @@ public class Symbol {
         return Collections.unmodifiableList(parameters);
     }
 
-    /**
-     * Called by the visitor to attach a decorator string to a FUNCTION symbol.
-     */
     public void addParameter(String parameter) {
         parameters.add(parameter);
     }

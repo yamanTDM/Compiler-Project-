@@ -1,3 +1,4 @@
+
 package Generation;
 
 import java.util.ArrayList;
@@ -5,19 +6,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Minimal JSON parser/writer used by the generator so it doesn't depend on
- * an external library (none of the project's build tooling / network
- * access allows pulling one in). Only supports what {@code products.json}
- * style files need: objects, arrays, strings, numbers, booleans, null.
- */
 public final class MiniJson {
 
     private MiniJson() {}
 
-    // ---------------------------------------------------------------
-    // Parsing
-    // ---------------------------------------------------------------
+
 
     public static Object parse(String text) {
         Parser p = new Parser(text);
@@ -133,9 +126,41 @@ public final class MiniJson {
         }
     }
 
-    // ---------------------------------------------------------------
-    // Writing (used for compiler_output/*.json)
-    // ---------------------------------------------------------------
+
+    public static String stringify(Object value) {
+        StringBuilder out = new StringBuilder();
+        writeValue(value, out);
+        return out.toString();
+    }
+
+    private static void writeValue(Object value, StringBuilder out) {
+        if (value == null) {
+            out.append("null");
+        } else if (value instanceof String text) {
+            out.append('"').append(escape(text)).append('"');
+        } else if (value instanceof Number || value instanceof Boolean) {
+            out.append(value);
+        } else if (value instanceof Map<?, ?> map) {
+            out.append('{');
+            int index = 0;
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                if (index++ > 0) out.append(',');
+                out.append('"').append(escape(String.valueOf(entry.getKey()))).append("\":");
+                writeValue(entry.getValue(), out);
+            }
+            out.append('}');
+        } else if (value instanceof Iterable<?> iterable) {
+            out.append('[');
+            int index = 0;
+            for (Object item : iterable) {
+                if (index++ > 0) out.append(',');
+                writeValue(item, out);
+            }
+            out.append(']');
+        } else {
+            out.append('"').append(escape(String.valueOf(value))).append('"');
+        }
+    }
 
     public static String escape(String s) {
         StringBuilder sb = new StringBuilder();

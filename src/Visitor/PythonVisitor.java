@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.IllegalFormatCodePointException;
 import java.util.List;
 
-public class PythonVisitor extends PythonParserBaseVisitor {
+public class PythonVisitor extends PythonParserBaseVisitor<Object> {
 
     @Override
     public Program visitProg(PythonParser.ProgContext ctx) {
@@ -174,7 +174,7 @@ public class PythonVisitor extends PythonParserBaseVisitor {
         if (ctx.else_if_stmt() != null) {
             for (int i = 0; i < ctx.else_if_stmt().expr().size(); i++) {
                 Expression elseIfCondition = (Expression) visit(ctx.else_if_stmt().expr().get(i));
-                Body elseIfBody = visitSuite(ctx.else_if_stmt().suite().get(1));
+                Body elseIfBody = visitSuite(ctx.else_if_stmt().suite().get(i));
                 ElseIfStatement elseIfStatement = new ElseIfStatement(line, elseIfCondition, elseIfBody);
                 ifStatement.addElseIfStatement(elseIfStatement);
             }

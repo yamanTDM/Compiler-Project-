@@ -7,12 +7,14 @@ import java.util.List;
 
 public class HTMLElement extends HTMLNode{
     private final String tag;
+    private final String endTag;
     private final List<Attribute> attributes;
     private final List<BodyNode> children;
 
-    public HTMLElement(int line,String tag) {
+    public HTMLElement(int line,String tag,String endTag) {
         super(line,"HTML Element");
         this.tag = tag;
+        this.endTag = endTag;
         attributes = new ArrayList<Attribute>();
         children = new ArrayList<>();
     }
@@ -37,6 +39,9 @@ public class HTMLElement extends HTMLNode{
 
     public String getTag() {
         return tag;
+    }
+    public String getEndTag() {
+        return endTag;
     }
 
     public List<Attribute> getAttributes() {

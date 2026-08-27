@@ -38,13 +38,15 @@ public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
             "wordcount", "slice", "sort", "sum", "min", "max", "unique", "urlencode",
             "tojson", "striptags", "indent", "center", "batch", "groupby", "map",
             "select", "reject", "selectattr", "rejectattr", "attr", "abs", "e",
-            "items", "reverse", "pprint", "random", "wordwrap", "xmlattr"
+            "items", "reverse", "pprint", "random", "wordwrap", "xmlattr", "url_for"
     );
 
     private final SymbolTable symbolTable;
     private final List<String> errors = new ArrayList<>();
 
     private final Deque<Scope> scopeStack = new ArrayDeque<>();
+    private final Set<String> blockNames = new HashSet<>();
+    private int inheritanceDepth = 0;
 
     public JinjaSemanticChecker(SymbolTable symbolTable) {
         this.symbolTable = symbolTable;
@@ -131,7 +133,6 @@ public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
         return null;
     }
 
-    /** Checks a base variable name (the first segment of a dotted path). */
     private void checkVariableUse(String baseName, int line) {
         if (baseName == null || baseName.isEmpty()) return;
 
@@ -163,12 +164,16 @@ public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
 
     @Override
     public Void visit(HTMLElement node) {
+        if(!node.getTag().equals(node.getEndTag())){
+            error(node.getLine(), "Start tag <" + node.getTag() +
+                    "> does not match end tag </" + node.getEndTag() + ">");        }
         for (Attribute attribute : node.getAttributes()) {
             attribute.accept(this);
         }
         for (BodyNode child : node.getChildren()) {
             child.accept(this);
         }
+
         return null;
     }
 
@@ -182,10 +187,9 @@ public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
 
     @Override
     public Void visit(Attribute node) {
-        // NOTE: AttributeValue (e.g. AttributeJinja) isn't exposed via a
-        // getter on Attribute in the current AST, so a Jinja expression used
-        // inside an HTML attribute (e.g. `id="{{ x }}"`) can't be reached
-        // from here yet. Nothing to check until that's exposed.
+        if (node.getValue() != null) {
+            node.getValue().accept(this);
+        }
         return null;
     }
 
@@ -215,18 +219,16 @@ public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
 
     @Override
     public Void visit(JinjaFunction node) {
-        // node.getName() is the filter/function name (e.g. `upper` in
-        // `name|upper`), not a variable reference - don't check it as one,
-        // just note if it's an unrecognized filter (best-effort, since
-        // user-defined macros are legitimate and unknowable here).
         String fname = node.getName().getFullName();
         if (!JINJA_BUILTIN_FILTERS.contains(fname)) {
             Symbol sym = lookup(fname);
             if (sym == null) {
-                // Soft signal only - could be a legitimate custom macro/filter,
-                // so we don't hard-error, just skip. Kept here as a hook point
-                // if stricter checking is wanted later.
+                error(node.getLine(), "Unsupported or undefined Jinja function/filter '"
+                        + fname + "'.");
             }
+        }
+        if ("url_for".equals(fname) && node.getArguments().isEmpty()) {
+            error(node.getLine(), "url_for() requires an endpoint name.");
         }
         for (JinjaExpr argument : node.getArguments()) {
             argument.accept(this);
@@ -237,7 +239,10 @@ public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
     @Override
     public Void visit(JinjaAssign node) {
         node.getValue().accept(this);
-        // node.getName() is the definition target, not a use - don't check it.
+        String target = node.getName().getFullName().toLowerCase(Locale.ROOT);
+        if (Set.of("true", "false", "none", "loop", "url_for").contains(target)) {
+            error(node.getLine(), "Cannot assign to reserved Jinja name '" + target + "'.");
+        }
         return null;
     }
 
@@ -275,11 +280,18 @@ public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
 
     @Override
     public Void visit(JinjaSuperBlock node) {
+        if (inheritanceDepth == 0) {
+            error(node.getLine(), "super() is only valid inside an inherited template block.");
+        }
         return null;
     }
 
     @Override
     public Void visit(JinjaBlock node) {
+        String blockName = node.getName().getFullName();
+        if (!blockNames.add(blockName)) {
+            error(node.getLine(), "Duplicate Jinja block name '" + blockName + "'.");
+        }
         for (BodyNode body : node.getBodys()) {
             body.accept(this);
         }
@@ -291,12 +303,14 @@ public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
 
     @Override
     public Void visit(JinjaInheritance node) {
+        inheritanceDepth++;
         for (BodyNode body : node.getBodys()) {
             body.accept(this);
         }
         for (JinjaBlock block : node.getBlocks()) {
             block.accept(this);
         }
+        inheritanceDepth--;
         return null;
     }
 
@@ -379,6 +393,10 @@ public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
     @Override
     public Void visit(JinjaFor node) {
         node.getCollectionName().accept(this); // the iterable must be defined
+        if (node.getItemName().getFullName().equals(node.getCollectionName().getFirst())) {
+            error(node.getLine(), "Loop variable must not shadow its collection '"
+                    + node.getCollectionName().getFirst() + "'.");
+        }
         if (node.getFilterCondition() != null) {
             node.getFilterCondition().accept(this);
         }

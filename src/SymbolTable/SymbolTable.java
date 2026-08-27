@@ -1,8 +1,11 @@
 package SymbolTable;
 
 import java.io.PrintStream;
-import java.util.*;
-
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.List;
 
 public class SymbolTable {
 
@@ -22,8 +25,7 @@ public class SymbolTable {
     }
 
     public void enterScope(String name) {
-        Scope newScope = new Scope(name, currentScope());
-        pushScope(newScope);
+        pushScope(new Scope(name, currentScope()));
     }
 
     public void exitScope() {
@@ -36,12 +38,24 @@ public class SymbolTable {
         return scopeStack.peek();
     }
 
-    public Symbol define(String name,String type, String value, SymbolKind kind, int line, boolean isGlobal) {
-        return currentScope().define(name,type,value, kind, line, isGlobal);
+    public Symbol define(
+            String name,
+            String type,
+            String value,
+            SymbolKind kind,
+            int line,
+            boolean isGlobal) {
+        return currentScope().define(name, type, value, kind, line, isGlobal);
     }
 
-    public Symbol defineInGlobal(String name,String type, String value, SymbolKind kind, int line, boolean isGlobal) {
-        return globalScope.define(name, type,value,kind, line, isGlobal);
+    public Symbol defineInGlobal(
+            String name,
+            String type,
+            String value,
+            SymbolKind kind,
+            int line,
+            boolean isGlobal) {
+        return globalScope.define(name, type, value, kind, line, isGlobal);
     }
 
     public Scope getGlobalScope() {
@@ -56,10 +70,9 @@ public class SymbolTable {
         Symbol latest = null;
         for (Scope scope : scopeStack) {
             for (Symbol symbol : scope.getSymbols()) {
-                if (symbol.getName().equals(name)) {
-                    if (latest == null || latest.getLine() < symbol.getLine()) {
-                        latest = symbol;
-                    }
+                if (symbol.getName().equals(name)
+                        && (latest == null || latest.getLine() < symbol.getLine())) {
+                    latest = symbol;
                 }
             }
         }
@@ -78,79 +91,53 @@ public class SymbolTable {
 
     public Symbol lookupGlobal(String name) {
         Symbol latest = null;
-
         for (Symbol symbol : globalScope.getSymbols()) {
-            if (symbol.getName().equals(name)) {
-                if (latest == null || latest.getLine() < symbol.getLine()) {
-                    latest = symbol;
-                }
+            if (symbol.getName().equals(name)
+                    && (latest == null || latest.getLine() < symbol.getLine())) {
+                latest = symbol;
             }
         }
         return latest;
     }
 
     public void print(PrintStream out) {
-        final int W = 123;   // Increased table width
+        String border = "+"
+                + "-".repeat(26) + "+"
+                + "-".repeat(20) + "+"
+                + "-".repeat(20) + "+"
+                + "-".repeat(24) + "+"
+                + "-".repeat(12) + "+"
+                + "-".repeat(12) + "+";
 
-        final String TOP = "╔" + "═".repeat(W + 2) + "╗";
-        final String BOTTOM = "╚" + "═".repeat(W + 2) + "╝";
-        final String DIV = "╠" + "═".repeat(W + 2) + "╣";
-        final String BLANK = "║" + " ".repeat(W + 2) + "║";
+        out.println(border);
+        out.println("| SYMBOL TABLE"
+                + " ".repeat(Math.max(0, border.length() - 15)) + "|");
+        out.println(border);
 
-        out.println(TOP);
-        out.println(centre("SYMBOL TABLE", W));
-        out.println(DIV);
-
-        for (int i = 0; i < allScopes.size(); i++) {
-            Scope scope = allScopes.get(i);
-
-            String parentInfo = scope.getParent() != null
-                    ? " (parent: " + scope.getParent().getName() + ")"
-                    : "";
-
-            out.println(left("  SCOPE: " + scope.getName() + parentInfo, W));
-
-            Collection<Symbol> symbols = scope.getSymbols();
-
-            if (symbols.isEmpty()) {
-                out.println(left("    (empty scope)", W));
+        for (Scope scope : allScopes) {
+            String parent = scope.getParent() == null
+                    ? ""
+                    : " (parent: " + scope.getParent().getName() + ")";
+            out.println("Scope: " + scope.getName() + parent);
+            out.println(border);
+            out.println(row("NAME", "KIND", "TYPE", "VALUE", "LINE", "GLOBAL"));
+            out.println(border);
+            if (scope.getSymbols().isEmpty()) {
+                out.println("| (empty)"
+                        + " ".repeat(Math.max(0, border.length() - 11)) + "|");
             } else {
-
-                out.println(
-                        "║  ┌──────────────────────────┬────────────────────┬────────────────────┬────────────────────────┬────────────┬────────────┐  ║");
-
-                out.println(row(
-                        "NAME",
-                        "KIND",
-                        "TYPE",
-                        "VALUE",
-                        "LINE",
-                        "ISGLOBAL"));
-
-                out.println(
-                        "║  ├──────────────────────────┼────────────────────┼────────────────────┼────────────────────────┼────────────┼────────────┤  ║");
-
-                for (Symbol sym : symbols) {
+                for (Symbol symbol : scope.getSymbols()) {
                     out.println(row(
-                            sym.getName(),
-                            sym.getKind().name(),
-                            sym.getType(),
-                            sym.getValue(),
-                            String.valueOf(sym.getLine()),
-                            String.valueOf(sym.isGlobal())
-                    ));
+                            symbol.getName(),
+                            symbol.getKind().name(),
+                            symbol.getType(),
+                            symbol.getValue(),
+                            String.valueOf(symbol.getLine()),
+                            String.valueOf(symbol.isGlobal())));
                 }
-
-                out.println(
-                        "║  └──────────────────────────┴────────────────────┴────────────────────┴────────────────────────┴────────────┴────────────┘  ║");
             }
-
-            if (i < allScopes.size() - 1) {
-                out.println(BLANK);
-            }
+            out.println(border);
         }
-
-        out.println(BOTTOM);
     }
 
     private static String row(
@@ -159,31 +146,20 @@ public class SymbolTable {
             String type,
             String value,
             String line,
-            String isGlobal
-    ) {
+            String global) {
         return String.format(
-                "║  │ %-24s │ %-18s │ %-18s │ %-22s │ %-10s │ %-10s │  ║",
-                truncate(name, 24),
-                truncate(kind, 18),
-                truncate(type, 18),
-                truncate(value, 22),
-                truncate(line, 10),
-                truncate(isGlobal, 10)
-        );
+                "| %-24s | %-18s | %-18s | %-22s | %-10s | %-10s |",
+                fit(name, 24),
+                fit(kind, 18),
+                fit(type, 18),
+                fit(value, 22),
+                fit(line, 10),
+                fit(global, 10));
     }
 
-    private static String truncate(String s, int max) {
-        if (s == null) return "";
-        return s.length() > max ? s.substring(0, max - 3) + "..." : s;
-    }
-
-    private static String centre(String text, int W) {
-        int pad = (W - text.length()) / 2;
-        return "║" + String.format("%-" + W + "s",
-                " ".repeat(Math.max(0, pad)) + text) + "  ║";
-    }
-
-    private static String left(String text, int W) {
-        return "║" + String.format("%-" + W + "s", text) + "  ║";
+    private static String fit(String value, int maximum) {
+        if (value == null) return "";
+        if (value.length() <= maximum) return value;
+        return value.substring(0, Math.max(0, maximum - 3)) + "...";
     }
 }

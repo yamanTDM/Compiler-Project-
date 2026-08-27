@@ -17,11 +17,12 @@ import java.util.Map;
 
 public class SymbolTableBuilder implements ASTVisitor<Void> {
     private final SymbolTable symbolTable = new SymbolTable();
-    private final Map<String,List<Symbol>>bridge = new HashMap<>();
+    private final Map<String, List<Symbol>> bridge = new HashMap<>();
 
-    public Map<String,List<Symbol>> getBridge() {
+    public Map<String, List<Symbol>> getBridge() {
         return bridge;
     }
+
     public SymbolTable getSymbolTable() {
         return symbolTable;
     }
@@ -114,13 +115,14 @@ public class SymbolTableBuilder implements ASTVisitor<Void> {
         }
         return null;
     }
+
     @Override
     public Void visit(AssignStatement node) {
         Expression lhs = node.getLeftExpression();
         Expression rhs = node.getRightExpression();
 
         if (lhs instanceof NameAtom nameAtom) {
-            String type  = inferType(rhs);
+            String type = inferType(rhs);
             String value = inferValue(rhs);
 
             var existing = symbolTable.lookup(nameAtom.getName());
@@ -131,7 +133,7 @@ public class SymbolTableBuilder implements ASTVisitor<Void> {
 
             if (isGlobal) {
                 globalSym = symbolTable.defineInGlobal(nameAtom.getName(), type, value, SymbolKind.VARIABLE, nameAtom.getLine(), true);
-                localSym  = symbolTable.define(nameAtom.getName(), type, value, SymbolKind.VARIABLE, nameAtom.getLine(), true);
+                localSym = symbolTable.define(nameAtom.getName(), type, value, SymbolKind.VARIABLE, nameAtom.getLine(), true);
             } else {
                 localSym = symbolTable.define(nameAtom.getName(), type, value, SymbolKind.VARIABLE, nameAtom.getLine(), false);
             }
@@ -150,12 +152,10 @@ public class SymbolTableBuilder implements ASTVisitor<Void> {
     }
 
     private void addDictAttributes(Symbol parent, DictionaryAtom dictAtom) {
-        System.out.println(parent.getName() + " : " + parent.getLine());
-
         for (DictionaryEntry entry : dictAtom.getEntries()) {
             if (entry.getKey() instanceof StringAtom keyAtom) {
-                String attrName  = keyAtom.getValue();
-                String attrType  = inferType(entry.getValue());
+                String attrName = keyAtom.getValue();
+                String attrType = inferType(entry.getValue());
                 String attrValue = inferValue(entry.getValue());
                 Symbol attrSymbol = new Symbol(attrName, attrType, attrValue, SymbolKind.ATTRIBUTE, dictAtom.getLine(), false);
                 parent.addAttribute(attrSymbol);
@@ -172,6 +172,7 @@ public class SymbolTableBuilder implements ASTVisitor<Void> {
         }
         return null;
     }
+
     @Override
     public Void visit(AugmentedPlus node) {
         updateOnAugmentedAssign(node.getLeftExpression(), node.getLine());
@@ -204,50 +205,198 @@ public class SymbolTableBuilder implements ASTVisitor<Void> {
         node.getExpression().accept(this);
         return null;
     }
-    @Override public Void visit(SimpleStatement node)        {
+
+    @Override
+    public Void visit(SimpleStatement node) {
         node.getStatement().accept(this);
         return null;
     }
 
 
-    @Override public Void visit(NameAtom node)               { return null; }
-    @Override public Void visit(IntegerAtom node)            { return null; }
-    @Override public Void visit(FloatAtom node)              { return null; }
-    @Override public Void visit(StringAtom node)             { return null; }
-    @Override public Void visit(Decorator node)              { return null; }
-    @Override public Void visit(DictionaryAtom node)         { return null; }
-    @Override public Void visit(FalseAtom node)              { return null; }
-    @Override public Void visit(GroupingAtom node)           { return null; }
-    @Override public Void visit(ListAtom node)               { return null; }
-    @Override public Void visit(ListComprehensionAtom node)  { return null; }
-    @Override public Void visit(NoneAtom node)               { return null; }
-    @Override public Void visit(TrueAtom node)               { return null; }
-    @Override public Void visit(CompareEqual node)           { return null; }
-    @Override public Void visit(CompareGreaterThan node)     { return null; }
-    @Override public Void visit(CompareGreaterThanEqual node){ return null; }
-    @Override public Void visit(CompareIn node)              { return null; }
-    @Override public Void visit(CompareLessThan node)        { return null; }
-    @Override public Void visit(CompareLessThanEqual node)   { return null; }
-    @Override public Void visit(CompareNotEqual node)        { return null; }
-    @Override public Void visit(CompareNotIn node)           { return null; }
-    @Override public Void visit(AccessAttributeExpression node)  { return null; }
+    @Override
+    public Void visit(NameAtom node) {
+        return null;
+    }
 
-    @Override public Void visit(AccessSubscriptExpression node)  { return null; }
-    @Override public Void visit(Addition node)               { return null; }
-    @Override public Void visit(AndExpression node)          { return null; }
-    @Override public Void visit(AssignExpression node)       { return null; }
-    @Override public Void visit(Atom node)                   { return null; }
-    @Override public Void visit(CompareExpression node)      { return null; }
-    @Override public Void visit(Comparision node)            { return null; }
-    @Override public Void visit(DictionaryEntry node)        { return null; }
-    @Override public Void visit(Division node)               { return null; }
-    @Override public Void visit(DottedName node)             { return null; }
-    @Override public Void visit(Multiplication node)         { return null; }
-    @Override public Void visit(NotExpression node)          { return null; }
-    @Override public Void visit(NumbericExpression node)     { return null; }
-    @Override public Void visit(OrExpression node)           { return null; }
-    @Override public Void visit(Subtraction node)            { return null; }
-    @Override public Void visit(ExpressionStatement node)    { return null; }
+    @Override
+    public Void visit(IntegerAtom node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(FloatAtom node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(StringAtom node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(Decorator node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(DictionaryAtom node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(FalseAtom node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(GroupingAtom node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(ListAtom node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(ListComprehensionAtom node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(NoneAtom node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(TrueAtom node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(CompareEqual node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(CompareGreaterThan node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(CompareGreaterThanEqual node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(CompareIn node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(CompareLessThan node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(CompareLessThanEqual node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(CompareNotEqual node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(CompareNotIn node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(AccessAttributeExpression node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(AccessSubscriptExpression node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(Addition node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(AndExpression node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(AssignExpression node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(Atom node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(CompareExpression node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(Comparision node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(DictionaryEntry node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(Division node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(DottedName node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(Multiplication node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(NotExpression node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(NumbericExpression node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(OrExpression node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(Subtraction node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(ExpressionStatement node) {
+        return null;
+    }
 
     @Override
     public Void visit(FromImport node) {
@@ -272,6 +421,7 @@ public class SymbolTableBuilder implements ASTVisitor<Void> {
         }
         return null;
     }
+
     @Override
     public Void visit(AccessFunctionExpression node) {
         if (node.getObject() instanceof NameAtom nameAtom
@@ -291,11 +441,12 @@ public class SymbolTableBuilder implements ASTVisitor<Void> {
 
                     if (pythonSideValue instanceof NameAtom valueRef) {
                         Symbol pythonSymbol = symbolTable.lookup(valueRef.getName());
-                        System.out.println(pythonSymbol.getName() + " : " + pythonSymbol.getLine());
+                        if (pythonSymbol == null) {
+                            continue;
+                        }
 
-                        Symbol newSymbol = new Symbol(jinjaSideName,pythonSymbol.getType(),pythonSymbol.getValue(),pythonSymbol.getKind(),pythonSymbol.getLine(), pythonSymbol.isGlobal());
+                        Symbol newSymbol = new Symbol(jinjaSideName, pythonSymbol.getType(), pythonSymbol.getValue(), pythonSymbol.getKind(), pythonSymbol.getLine(), pythonSymbol.isGlobal());
                         for (Symbol attribute : pythonSymbol.getAttributes()) {
-                            System.out.println(attribute.getName());
                             newSymbol.addAttribute(attribute);
                         }
                         symbols.add(newSymbol);
@@ -307,14 +458,46 @@ public class SymbolTableBuilder implements ASTVisitor<Void> {
         }
         return null;
     }
-    @Override public Void visit(ImportStatement node)        { return null; }
-    @Override public Void visit(CompoundStatement node)      { return null; }
-    @Override public Void visit(Expression node)             { return null; }
-    @Override public Void visit(Node node)                   { return null; }
-    @Override public Void visit(SmallStatement node)         { return null; }
-    @Override public Void visit(Statement node)              { return null; }
-    @Override public Void visit(TargetExpression node)       { return null; }
-    @Override public Void visit(ValueExpression node)        { return null; }
+
+    @Override
+    public Void visit(ImportStatement node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(CompoundStatement node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(Expression node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(Node node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(SmallStatement node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(Statement node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(TargetExpression node) {
+        return null;
+    }
+
+    @Override
+    public Void visit(ValueExpression node) {
+        return null;
+    }
 
     @Override
     public Void visit(GeneratorAtom node) {
@@ -323,24 +506,24 @@ public class SymbolTableBuilder implements ASTVisitor<Void> {
 
 
     private static String inferType(Expression expr) {
-        if (expr instanceof IntegerAtom)   return "int";
-        if (expr instanceof FloatAtom)     return "float";
-        if (expr instanceof StringAtom)    return "string";
+        if (expr instanceof IntegerAtom) return "int";
+        if (expr instanceof FloatAtom) return "float";
+        if (expr instanceof StringAtom) return "string";
         if (expr instanceof TrueAtom
-                || expr instanceof FalseAtom)     return "bool";
-        if (expr instanceof NoneAtom)      return "None";
-        if (expr instanceof ListAtom)      return "list";
-        if (expr instanceof DictionaryAtom)return "dict";
+                || expr instanceof FalseAtom) return "bool";
+        if (expr instanceof NoneAtom) return "None";
+        if (expr instanceof ListAtom) return "list";
+        if (expr instanceof DictionaryAtom) return "dict";
         return null;
     }
 
     private static String inferValue(Expression expr) {
-        if (expr instanceof IntegerAtom a)  return String.valueOf(a.getValue());
-        if (expr instanceof FloatAtom a)    return String.valueOf(a.getValue());
-        if (expr instanceof StringAtom a)   return a.getValue();
-        if (expr instanceof TrueAtom)       return "True";
-        if (expr instanceof FalseAtom)      return "False";
-        if (expr instanceof NoneAtom)       return "None";
+        if (expr instanceof IntegerAtom a) return String.valueOf(a.getValue());
+        if (expr instanceof FloatAtom a) return String.valueOf(a.getValue());
+        if (expr instanceof StringAtom a) return a.getValue();
+        if (expr instanceof TrueAtom) return "True";
+        if (expr instanceof FalseAtom) return "False";
+        if (expr instanceof NoneAtom) return "None";
         return null;
     }
 

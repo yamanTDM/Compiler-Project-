@@ -9,7 +9,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import java.util.Objects;
 
 
-public class JinjaHtmlVisitor extends JinjaHtmlParserBaseVisitor {
+public class JinjaHtmlVisitor extends JinjaHtmlParserBaseVisitor<Object> {
 
 
     @Override
@@ -33,7 +33,8 @@ public class JinjaHtmlVisitor extends JinjaHtmlParserBaseVisitor {
     @Override
     public HTMLElement visitHtmlElement(JinjaHtmlParser.HtmlElementContext ctx) {
         int line = ctx.start.getLine();
-        HTMLElement htmlElement = new HTMLElement(line, ctx.startElement().PAIRED_TAG().getText());
+
+        HTMLElement htmlElement = new HTMLElement(line, ctx.startElement().PAIRED_TAG().getText(), ctx.endElement().PAIRED_TAG().getText());
         if (ctx.startElement().attribute() != null) {
             for (int i = 0; i < ctx.startElement().attribute().size(); i++) {
                 htmlElement.addAttribute(visitAttribute(ctx.startElement().attribute().get(i)));

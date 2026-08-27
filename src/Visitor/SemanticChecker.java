@@ -13,26 +13,6 @@ import SymbolTable.SymbolTable;
 
 import java.util.*;
 
-/**
- * Walks the Python AST *after* {@link SymbolTableBuilder} has already run and
- * built a {@link SymbolTable}, and reports semantic errors:
- *
- *  - use of undeclared/undefined names
- *  - calls to undefined functions
- *  - function calls with the wrong number of positional arguments
- *  - obviously incompatible types in arithmetic expressions
- *  - division by a literal zero
- *  - `return` outside of a function body
- *
- * It returns, from every `visit`, a best-effort inferred type string
- * ("int", "float", "string", "bool", "list", "dict", "None") or null when the
- * type can't be determined - this lets binary operators check their operands.
- *
- * IMPORTANT: This class does NOT mutate the SymbolTable. It re-uses the Scope
- * tree that SymbolTableBuilder already built by walking Scope.getChildren()
- * in the same order the AST was originally visited, so lookups reflect the
- * right lexical scope without re-defining anything.
- */
 public class SemanticChecker implements ASTVisitor<String> {
 
     private static final Set<String> BUILTINS = Set.of(
@@ -45,15 +25,11 @@ public class SemanticChecker implements ASTVisitor<String> {
             "bytes", "bytearray", "object", "property", "slice", "reversed", "exec", "eval"
     );
 
-    // Module-level dunder names Python defines automatically for every module.
     private static final Set<String> PREDEFINED_NAMES = Set.of(
             "__name__", "__file__", "__doc__", "__package__", "__loader__", "__spec__", "__builtins__"
     );
 
-    // Types we're confident are NOT callable, used to flag "X is not a function".
-    // We deliberately do NOT flag SymbolKind.IMPORT, CLASS, PARAMETER, or symbols
-    // with an unknown type - imported names, classes, and parameters are very
-    // often callable, and we'd rather miss a real error than raise a false one.
+    
     private static final Set<String> KNOWN_NON_CALLABLE_TYPES = Set.of(
             "int", "float", "string", "bool", "dict", "list", "None"
     );

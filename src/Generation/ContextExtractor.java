@@ -62,10 +62,8 @@ public class ContextExtractor {
 
     private static final Object UNRESOLVED = Unresolved.VALUE;
 
-    /** module-level variable name -> resolved value (or UNRESOLVED) */
     public final Map<String, Object> moduleContext = new LinkedHashMap<>();
 
-    /** human-readable trace of every resolution decision, for generation_log.txt */
     public final List<String> log = new ArrayList<>();
 
     private final Map<String, FunctionStatement> functions = new LinkedHashMap<>();
@@ -82,9 +80,6 @@ public class ContextExtractor {
         }
     }
 
-    // -----------------------------------------------------------------
-    // Module-level pass
-    // -----------------------------------------------------------------
 
     private void collectFunctions(List<Statement> stmts) {
         for (Statement st : stmts) {
@@ -114,9 +109,6 @@ public class ContextExtractor {
         }
     }
 
-    // -----------------------------------------------------------------
-    // Whitelisted zero-arg user function inlining
-    // -----------------------------------------------------------------
 
     private Object inlineZeroArgFunction(String name) {
         FunctionStatement fn = functions.get(name);
@@ -128,7 +120,7 @@ public class ContextExtractor {
             log.add("  -> could not statically resolve function '" + name + "': " + r.reason);
             return UNRESOLVED;
         }
-        return r.returned ? r.value : null; // implicit Python "return None"
+        return r.returned ? r.value : null;
     }
 
     private static final class ExecResult {
@@ -156,9 +148,7 @@ public class ContextExtractor {
                         scope.put(target.getName(), evalExpr(as.getRightExpression(), scope));
                     }
                 }
-                // other small statements (imports, plain expression calls like os.makedirs(...),
-                // global statements, augmented assigns) are intentionally no-ops: they don't
-                // affect the value being resolved and are outside the safe-evaluation whitelist.
+
             } else if (st instanceof IfStatement ifs) {
                 Object cond = evalExpr(ifs.getCondition(), scope);
                 if (cond == UNRESOLVED) return ExecResult.giveUp("if-condition at line " + ifs.getLine() + " is not resolvable");
@@ -189,15 +179,10 @@ public class ContextExtractor {
                 ExecResult r = exec(ws.getBody(), scope);
                 if (r.returned || r.gaveUp) return r;
             }
-            // nested function/class defs and other compound statements: not needed for
-            // the whitelisted patterns this resolver targets, safely ignored.
+
         }
         return ExecResult.none();
     }
-
-    // -----------------------------------------------------------------
-    // Expression evaluator
-    // -----------------------------------------------------------------
 
     Object evalExpr(Expression e, Map<String, Object> scope) {
         if (e == null) return null;
@@ -318,8 +303,6 @@ public class ContextExtractor {
             return result;
         }
 
-        // NumbericExpression base, DottedName, TargetExpression, etc: outside the
-        // resolver's supported subset.
         return UNRESOLVED;
     }
 
@@ -349,6 +332,7 @@ public class ContextExtractor {
                 if (!(f instanceof OpenedFile of)) return UNRESOLVED;
                 try {
                     String text = Files.readString(Path.of(resolvePath(of.path)), StandardCharsets.UTF_8);
+
                     return MiniJson.parse(text);
                 } catch (IOException ex) {
                     log.add("  -> json.load could not read '" + of.path + "': " + ex.getMessage());
@@ -391,8 +375,6 @@ public class ContextExtractor {
             }
         }
     }
-
-    /** Builds a dotted name like "os.path.exists" out of nested attribute access. */
     private String dottedName(NumbericExpression object) {
         if (object instanceof NameAtom n) return n.getName();
         if (object instanceof AccessAttributeExpression a) {
@@ -460,7 +442,6 @@ public class ContextExtractor {
         return s.length() > 80 ? s.substring(0, 77) + "..." : s;
     }
 
-    /** Marker returned by open(); real file access happens at json.load(). */
     private static final class OpenedFile {
         final String path;
         final String mode;

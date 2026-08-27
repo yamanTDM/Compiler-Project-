@@ -10,7 +10,6 @@ app = Flask(__name__)
 # -----------------------
 UPLOAD_FOLDER = "static/uploads"
 DATA_FILE = "products.json"
-x = 3
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -23,6 +22,7 @@ def load_products():
         with open(DATA_FILE, "r") as f:
             return json.load(f)
     return []
+
 
 def save_products(products):
     with open(DATA_FILE, "w") as f:
@@ -94,4 +94,3 @@ def delete(id):
 # -----------------------
 if __name__ == "__main__":
     app.run(debug=True)
-

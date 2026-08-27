@@ -2,10 +2,7 @@ package SymbolTable;
 
 import java.util.*;
 
-/**
- * A single lexical scope.
- */
-public class Scope {
+public final class Scope {
 
     private final String name;
     private final Scope parent;

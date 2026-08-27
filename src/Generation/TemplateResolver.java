@@ -1,3 +1,5 @@
+package Generation;
+
 import AST.BodyNode;
 import AST.JinjaBlock;
 import AST.JinjaSuperBlock;
@@ -42,6 +44,9 @@ public class TemplateResolver {
     }
 
     private static boolean containsSuper(JinjaBlock block) {
+        if (block.getSuperBlock() != null) {
+            return true;
+        }
         List<Node> found = new ArrayList<>();
         collectSuperCalls(block, found);
         return !found.isEmpty();
@@ -71,15 +76,8 @@ public class TemplateResolver {
     private static void mergeWithSuper(JinjaBlock baseBlock, JinjaBlock fillBlock) {
 
         for (BodyNode b : fillBlock.getBodys()) {
-            if (!containsOnlySuper(b)) {
-                baseBlock.addBody(b);
-            }
+            baseBlock.addBody(b);
         }
-    }
-
-    private static boolean containsOnlySuper(BodyNode body) {
-        List<Node> children = body.getChildrenSearch();
-        return children.size() == 1 && children.get(0) instanceof JinjaSuperBlock;
     }
 
     public static void getBlock(Node node, List<JinjaBlock> blocks) {

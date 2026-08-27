@@ -102,12 +102,9 @@ mode TAG;
 
 CT : '>' -> popMode ;
 
-
-
 STYLE_TAG
     : 'style>' -> pushMode(CSS)
     ;
-
 
 DQ_START
     : '"' -> pushMode(DQ_STRING)

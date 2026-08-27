@@ -1,19 +1,51 @@
+=== Compiler input ===
+Input directory: C:\Users\HP\Desktop\UniProjects\Compiler Project\Tests
+Python source: C:\Users\HP\Desktop\UniProjects\Compiler Project\Tests\python.py
+Templates discovered: 4
+  C:\Users\HP\Desktop\UniProjects\Compiler Project\Tests\templates\add.html -> template 'add.html' -> add.html
+  C:\Users\HP\Desktop\UniProjects\Compiler Project\Tests\templates\base.html -> template 'base.html' -> base.html
+  C:\Users\HP\Desktop\UniProjects\Compiler Project\Tests\templates\details.html -> template 'detail.html' -> detail.html
+  C:\Users\HP\Desktop\UniProjects\Compiler Project\Tests\templates\index.html -> template 'index.html' -> index.html
+
 === Context extraction (Python) ===
+Generator context source: Python AST ContextExtractor only.
   -> call to 'Flask(...)' is outside the resolver's whitelist; treated as unresolved.
 UNRESOLVED  app (line 6): right-hand side is not a literal and could not be reduced by the whitelisted-builtin resolver.
 RESOLVED    UPLOAD_FOLDER = static/uploads (line 11)
 RESOLVED    DATA_FILE = products.json (line 12)
-RESOLVED    x = 3 (line 13)
 RESOLVED    products = [{id=1, name=Burger, price=2145121.0, details=cheese burger, image=double-che... (line 34)
-RESOLVED    next_id = 5 (line 37)
+RESOLVED    next_id = 6 (line 37)
 
 === HTML generation ===
-Fan-out: generated detail_1.html with product = products[id=1]
-Fan-out: generated detail_2.html with product = products[id=2]
-Fan-out: generated detail_3.html with product = products[id=3]
-Fan-out: generated detail_4.html with product = products[id=4]
+Fan-out: generated detail_1.html from products where id=1.
+Fan-out: generated detail_2.html from products where id=2.
+Fan-out: generated detail_3.html from products where id=3.
+Fan-out: generated detail_4.html from products where id=4.
+Fan-out: generated detail_5.html from products where id=5.
 
-=== Pass-through files ===
-Copied pass-through file unchanged: python.txt
-Pass-through file not found, skipped: Tests\style.css
-Pass-through file not found, skipped: Tests\script.js
+=== Generated pages ===
+add.html
+base.html
+detail.html
+detail_1.html
+detail_2.html
+detail_3.html
+detail_4.html
+detail_5.html
+index.html
+
+=== Copied input files ===
+products.json
+python.py
+static/uploads/914648_3f79eee8a5b3466bb4feb38453c9c9c3mv2.png
+static/uploads/ab67616d00001e0296fa88fb1789be437d5cb4b6.jpg
+static/uploads/double-cheeseburger-ss-NEW.png
+static/uploads/EXPS_TOHD24_167133_SarahTramonte_6.jpg
+static/uploads/french_fries.png
+static/uploads/greek-salmon-bowl-f681500cbe054bb1adb607ff55094075.jpeg
+templates/add.html
+templates/base.html
+templates/details.html
+templates/index.html
+app.py (unchanged alias of python.py)
+
