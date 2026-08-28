@@ -40,7 +40,7 @@ public class Main {
     private static final Path DEFAULT_INPUT_DIR = Path.of("Tests");
 
     public static void main(String[] args) throws IOException {
-       
+
 
         List<String> positional = new ArrayList<>();
         boolean serve = false;

@@ -477,7 +477,10 @@ public class JinjaHtmlVisitor extends JinjaHtmlParserBaseVisitor<Object> {
         int line = ctx.start.getLine();
         Condition ifCondition = (Condition) visit(ctx.jinjaIf().jinjaConditions());
         BodyNode ifBody = (BodyNode) visit(ctx.jinjaIf().body());
-        BodyNode elseBody = (BodyNode) visit(ctx.jinjaElse().body());
+        BodyNode elseBody = null;
+        if (ctx.jinjaElse() != null) {
+            elseBody = (BodyNode) visit(ctx.jinjaElse().body());
+        }
         JinjaIf jinjaIf = new JinjaIf(line, ifCondition, ifBody, elseBody);
         if (ctx.jinjaElseIf() != null) {
             for (int i = 0; i < ctx.jinjaElseIf().size(); i++) {

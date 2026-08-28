@@ -14,14 +14,13 @@ UNRESOLVED  app (line 6): right-hand side is not a literal and could not be redu
 RESOLVED    UPLOAD_FOLDER = static/uploads (line 11)
 RESOLVED    DATA_FILE = products.json (line 12)
 RESOLVED    products = [{id=1, name=Burger, price=2145121.0, details=cheese burger, image=double-che... (line 34)
-RESOLVED    next_id = 6 (line 37)
+RESOLVED    next_id = 5 (line 37)
 
 === HTML generation ===
 Fan-out: generated detail_1.html from products where id=1.
 Fan-out: generated detail_2.html from products where id=2.
 Fan-out: generated detail_3.html from products where id=3.
 Fan-out: generated detail_4.html from products where id=4.
-Fan-out: generated detail_5.html from products where id=5.
 
 === Generated pages ===
 add.html
@@ -31,7 +30,6 @@ detail_1.html
 detail_2.html
 detail_3.html
 detail_4.html
-detail_5.html
 index.html
 
 === Copied input files ===

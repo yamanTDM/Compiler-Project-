@@ -17,10 +17,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Discovers all Jinja templates and resolves their inheritance graph without
- * hard-coded base/child file names.
- */
 public final class TemplateRepository {
 
     @FunctionalInterface

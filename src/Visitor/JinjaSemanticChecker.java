@@ -8,29 +8,8 @@ import SymbolTable.SymbolTable;
 
 import java.util.*;
 
-/**
- * Walks a resolved Jinja/HTML template AST *after* {@link JinjaSymbolTableBuilder}
- * has already built its {@link SymbolTable} (which itself is seeded with the
- * variables bound from Python via {@code render_template(name=value, ...)} -
- * see {@code Main.processTemplate} / {@code SymbolTableBuilder.getBridge()}).
- *
- * Reports:
- *  - use of a template variable that is neither a loop variable, a `{% set %}`
- *    variable, NOR one of the variables passed in from Python. The error
- *    message explicitly calls out the Python side, since that's the most
- *    common real-world cause ("you forgot to pass this into render_template").
- *  - a variable that IS defined, but only in another scope (e.g. inside a
- *    different `{% for %}` loop) - reported as "out of scope" rather than
- *    "undefined", same distinction as the Python checker.
- *
- * Like {@link SemanticChecker}, this class does not mutate the SymbolTable;
- * it re-uses the Scope tree JinjaSymbolTableBuilder already built.
- */
 public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
 
-    // Common built-in Jinja filters/tests - used as function/filter names,
-    // never as variables, so `{{ name|upper }}` shouldn't try to resolve
-    // "upper" as a variable.
     private static final Set<String> JINJA_BUILTIN_FILTERS = Set.of(
             "length", "upper", "lower", "capitalize", "title", "trim", "default",
             "join", "first", "last", "count", "round", "safe", "escape", "int",
@@ -152,7 +131,6 @@ public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
                 + "in this template.");
     }
 
-    // ── program structure ───────────────────────────────────────────────────
 
     @Override
     public Void visit(Program node) {
@@ -270,12 +248,12 @@ public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
 
     @Override
     public Void visit(JinjaText node) {
-        return null; // leaf, literal string - not a variable
+        return null;
     }
 
     @Override
     public Void visit(Text node) {
-        return null; // leaf, literal HTML text
+        return null;
     }
 
     @Override
@@ -338,11 +316,6 @@ public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
         return null;
     }
 
-    // ── conditions ──────────────────────────────────────────────────────
-    // CompareCondition/VariableCondition store their operands as raw Strings
-    // rather than JinjaId nodes, so we apply a small heuristic: treat a
-    // token as a variable reference unless it's clearly a literal (quoted
-    // string, number, true/false/none).
 
     private static boolean looksLikeLiteral(String token) {
         if (token == null || token.isEmpty()) return true;
@@ -392,7 +365,7 @@ public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
 
     @Override
     public Void visit(JinjaFor node) {
-        node.getCollectionName().accept(this); // the iterable must be defined
+        node.getCollectionName().accept(this);
         if (node.getItemName().getFullName().equals(node.getCollectionName().getFirst())) {
             error(node.getLine(), "Loop variable must not shadow its collection '"
                     + node.getCollectionName().getFirst() + "'.");
@@ -407,7 +380,6 @@ public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
         }
         exitScope();
 
-        // getItemName() is the loop variable being *defined*, not used - skip it.
 
         if (node.getElseBody() != null) {
             node.getElseBody().accept(this);
@@ -415,7 +387,6 @@ public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
         return null;
     }
 
-    // ── CSS: out of scope for variable-definition checks ────────────────
 
     @Override public Void visit(CSSAllSelector node)       { return null; }
     @Override public Void visit(CSSBody node)              { return null; }
@@ -437,7 +408,6 @@ public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
     @Override public Void visit(CSSText node)              { return null; }
     @Override public Void visit(CSSTranslateFunction node) { return null; }
 
-    // ── generic / structural fall-throughs ──────────────────────────────
 
     @Override public Void visit(BodyNode node)  { return null; }
     @Override public Void visit(HTMLNode node)  { return null; }
