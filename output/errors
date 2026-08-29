@@ -1,0 +1,155 @@
+==========================================================================================================================================
+PYTHON
+==========================================================================================================================================
+
+
+# Variable 'undefined_variable' is used but never defined.
+print(undefined_variable)
+
+
+# Function 'unknown_function' is used but never defined.
+unknown_function()
+
+
+# 'number' is not a function but is being called.
+number = 10
+number()
+
+
+# Function 'add' called with 1 argument(s) but requires 2.
+def add(a, b):
+    return a + b
+
+add(10)
+
+# Function 'multiply' called with 3 argumentS but only accepts 2.
+def multiply(a, b):
+    return a * b
+
+multiply(2, 3, 4)
+
+# 'return' used outside of a function.
+return 10
+
+
+# Type mismatch - cannot apply '-' to 'int' and 'string'.
+L = 10
+M = "hello"
+
+result1 = L - M
+
+
+# Type mismatch - cannot apply '+' to 'int' and 'bool'.
+number2 = 10
+flag = True
+
+result2 = number2 + flag
+
+# Division by literal zero.
+result3 = 10 / 0
+
+
+# Variable 'local_variable' is defined in scope 'first_function' but is out of scope here
+def first_function():
+    local_variable = 100
+
+first_function()
+
+print(local_variable)
+
+
+# Function 'inner_function' is defined in scope 'outer_function' but is out of scope here
+def outer_function():
+    def inner_function():
+        return 10
+
+outer_function()
+
+inner_function()
+
+
+
+
+# Type mismatch - cannot apply '+' to 'int' and 'string'.
+counter = 10
+counter += "hello"
+
+
+==========================================================================================================================================
+JINJA
+==========================================================================================================================================
+
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Undefined template variable -->
+    <title>{{ undefined_variable }}</title>
+</head>
+
+<body>
+
+<!-- Variable defined in another scope -->
+<p>{{ out_of_scope_variable }}</p>
+
+
+<!-- Undefined variable in an if condition -->
+{% if missing_condition %}
+<p>Condition</p>
+{% endif %}
+
+
+<!-- Undefined variable in a comparison -->
+{% if missing_age > 18 %}
+<p>Adult</p>
+{% endif %}
+
+
+<!-- Undefined variable in a for collection -->
+{% for user in missing_users %}
+<p>{{ user }}</p>
+{% endfor %}
+
+
+<!-- Undefined variable inside a loop condition -->
+{% for user in users if missing_filter %}
+<p>{{ user }}</p>
+{% endfor %}
+
+
+<!-- Loop variable shadows collection -->
+{% for users in users %}
+<p>{{ users }}</p>
+{% endfor %}
+
+
+<!-- Undefined Jinja function -->
+{{ unknown_function() }}
+
+
+<!-- url_for() without endpoint -->
+{{ url_for() }}
+
+
+<!-- Assigning to a reserved Jinja name -->
+{% set true = "hello" %}
+
+
+<!-- super() outside inherited template block -->
+{{ super() }}
+
+
+<!-- Duplicate Jinja block name -->
+{% block content %}
+<p>First content</p>
+{% endblock %}
+
+{% block content %}
+<p>Second content</p>
+{% endblock %}
+
+
+<!-- Undefined variable in a Jinja function argument -->
+{{ url_for("profile", user_id=missing_user_id) }}
+
+</body>
+</html>

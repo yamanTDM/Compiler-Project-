@@ -33,6 +33,7 @@ detail_4.html
 index.html
 
 === Copied input files ===
+errors
 products.json
 python.py
 static/uploads/914648_3f79eee8a5b3466bb4feb38453c9c9c3mv2.png

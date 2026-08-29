@@ -10,15 +10,7 @@ import java.util.*;
 
 public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
 
-    private static final Set<String> JINJA_BUILTIN_FILTERS = Set.of(
-            "length", "upper", "lower", "capitalize", "title", "trim", "default",
-            "join", "first", "last", "count", "round", "safe", "escape", "int",
-            "float", "string", "list", "dictsort", "format", "replace", "truncate",
-            "wordcount", "slice", "sort", "sum", "min", "max", "unique", "urlencode",
-            "tojson", "striptags", "indent", "center", "batch", "groupby", "map",
-            "select", "reject", "selectattr", "rejectattr", "attr", "abs", "e",
-            "items", "reverse", "pprint", "random", "wordwrap", "xmlattr", "url_for"
-    );
+
 
     private final SymbolTable symbolTable;
     private final List<String> errors = new ArrayList<>();
@@ -101,10 +93,10 @@ public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
         }
     }
 
-    private ScopedSymbol findAnywhere(String name) {
+    private ScopedSymbol findAnywhere(String name, int useLine) {
         for (Scope scope : symbolTable.getAllScopes()) {
             for (Symbol sym : scope.getSymbols()) {
-                if (sym.getName().equals(name)) {
+                if (sym.getName().equals(name) && sym.getLine() < useLine) {
                     return new ScopedSymbol(sym, scope);
                 }
             }
@@ -118,7 +110,7 @@ public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
         Symbol sym = lookup(baseName);
         if (sym != null) return;
 
-        ScopedSymbol elsewhere = findAnywhere(baseName);
+        ScopedSymbol elsewhere = findAnywhere(baseName, line);
         if (elsewhere != null) {
             error(line, "Template variable '" + baseName + "' is defined in scope '"
                     + elsewhere.scope.getName() + "' (line " + elsewhere.symbol.getLine()
@@ -198,13 +190,19 @@ public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
     @Override
     public Void visit(JinjaFunction node) {
         String fname = node.getName().getFullName();
-        if (!JINJA_BUILTIN_FILTERS.contains(fname)) {
-            Symbol sym = lookup(fname);
-            if (sym == null) {
-                error(node.getLine(), "Unsupported or undefined Jinja function/filter '"
-                        + fname + "'.");
+        if(fname.equals("super") ){
+            if (inheritanceDepth == 0) {
+                error(node.getLine(), "super() is only valid inside an inherited template block.");
             }
         }
+        Symbol sym = lookup(fname);
+
+        if (sym == null && !fname.equals("super") && !fname.equals("url_for")) {
+            error(node.getLine(),
+                    "Undefined Jinja function '" + fname + "'.");
+        }
+
+
         if ("url_for".equals(fname) && node.getArguments().isEmpty()) {
             error(node.getLine(), "url_for() requires an endpoint name.");
         }
@@ -218,7 +216,7 @@ public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
     public Void visit(JinjaAssign node) {
         node.getValue().accept(this);
         String target = node.getName().getFullName().toLowerCase(Locale.ROOT);
-        if (Set.of("true", "false", "none", "loop", "url_for").contains(target)) {
+        if (Set.of("set","true", "false", "none", "loop", "url_for").contains(target)) {
             error(node.getLine(), "Cannot assign to reserved Jinja name '" + target + "'.");
         }
         return null;
@@ -242,6 +240,11 @@ public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
 
     @Override
     public Void visit(JinjaId node) {
+        String target = node.getFullName().toLowerCase(Locale.ROOT);
+        if (Set.of("set","true", "false", "none", "loop", "url_for").contains(target)) {
+            error(node.getLine(), "Cannot assign to reserved Jinja name '" + target + "'.");
+            return  null;
+        }
         checkVariableUse(node.getFirst(), node.getLine());
         return null;
     }
@@ -267,6 +270,7 @@ public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
     @Override
     public Void visit(JinjaBlock node) {
         String blockName = node.getName().getFullName();
+
         if (!blockNames.add(blockName)) {
             error(node.getLine(), "Duplicate Jinja block name '" + blockName + "'.");
         }

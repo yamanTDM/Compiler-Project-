@@ -72,7 +72,6 @@ public class SemanticChecker implements ASTVisitor<String> {
         System.out.println(RESET);
     }
 
-    // ── scope navigation (read-only w.r.t. the SymbolTable) ────────────────
 
     private void enterFunctionScope(String name) {
         Scope parent = scopeStack.peek();
@@ -88,8 +87,6 @@ public class SemanticChecker implements ASTVisitor<String> {
             }
         }
         if (target == null) {
-            // Shouldn't normally happen if SymbolTableBuilder ran first; fall
-            // back to an empty scope so we don't crash the whole pass.
             target = new Scope(name, parent);
         }
         scopeStack.push(target);
@@ -117,7 +114,6 @@ public class SemanticChecker implements ASTVisitor<String> {
         errors.add("Line " + line + ": " + message);
     }
 
-    /** Pairs a symbol with the scope it was found in, for out-of-scope reporting. */
     private static final class ScopedSymbol {
         final Symbol symbol;
         final Scope scope;
@@ -149,7 +145,6 @@ public class SemanticChecker implements ASTVisitor<String> {
         }
     }
 
-    // ── program structure ───────────────────────────────────────────────────
 
     @Override
     public String visit(Program node) {
@@ -573,7 +568,11 @@ public class SemanticChecker implements ASTVisitor<String> {
                         .filter(a -> !(a instanceof AssignExpression))
                         .count();
                 int expectedParams = sym.getParameters().size();
-
+                if (positionalArgs < expectedParams) {
+                    error(node.getLine(), "Function '" + fname + "' called with "
+                            + positionalArgs + " argument(s) but requires "
+                            + expectedParams + ".");
+                }
                 if (expectedParams > 0 && positionalArgs > expectedParams) {
                     error(node.getLine(), "Function '" + fname + "' called with " + positionalArgs
                             + " positional argument(s) but only accepts " + expectedParams + ".");
