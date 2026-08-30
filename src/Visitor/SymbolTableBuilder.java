@@ -189,7 +189,7 @@ public class SymbolTableBuilder implements ASTVisitor<Void> {
         if (lhs instanceof NameAtom nameAtom) {
             var existing = symbolTable.lookup(nameAtom.getName());
             boolean isGlobal = existing != null && existing.isGlobal();
-            String type = existing != null ? existing.getType() : null; // adjust getter name to match your SymbolEntry class
+            String type = existing != null ? existing.getType() : null;
 
             if (isGlobal) {
                 symbolTable.defineInGlobal(nameAtom.getName(), type, null, SymbolKind.VARIABLE, line, true);

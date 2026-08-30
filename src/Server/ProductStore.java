@@ -60,8 +60,6 @@ public final class ProductStore {
         }
         return copy;
     }
-
-    /** Returns an independent snapshot; callers may not mutate the store through it. */
     public synchronized List<Map<String, Object>> list() {
         List<Map<String, Object>> copy = new ArrayList<>();
         for (Map<String, Object> product : products) {
@@ -108,8 +106,7 @@ public final class ProductStore {
             if (persistPath.getParent() != null) Files.createDirectories(persistPath.getParent());
             Files.writeString(persistPath, MiniJson.stringify(products), StandardCharsets.UTF_8);
         } catch (IOException ignored) {
-            // Persistence is a convenience; the in-memory store stays authoritative
-            // for the lifetime of this server process either way.
+
         }
     }
 }

@@ -5,17 +5,13 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
-# -----------------------
 # Config
-# -----------------------
 UPLOAD_FOLDER = "static/uploads"
 DATA_FILE = "products.json"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# -----------------------
 # Load / Save functions
-# -----------------------
 
 def load_products():
     if os.path.exists(DATA_FILE):
@@ -28,17 +24,13 @@ def save_products(products):
     with open(DATA_FILE, "w") as f:
         json.dump(products, f, indent=4)
 
-# -----------------------
 # Initialize data
-# -----------------------
 products = load_products()
 
 # auto-set next_id
 next_id = max([p["id"] for p in products], default=0) + 1
 
-# -----------------------
 # Routes
-# -----------------------
 @app.route("/")
 def index():
     return render_template("index.html", products=products)
@@ -65,7 +57,7 @@ def add():
         }
 
         products.append(product)
-        save_products(products)   # ✅ save to file
+        save_products(products)
 
         next_id += 1
         return redirect(url_for("index"))
@@ -84,13 +76,11 @@ def delete(id):
     global products
     products = [p for p in products if p["id"] != id]
 
-    save_products(products)   # ✅ update file
+    save_products(products)
 
     return redirect(url_for("index"))
 
 
-# -----------------------
 # Run
-# -----------------------
 if __name__ == "__main__":
     app.run(debug=True)

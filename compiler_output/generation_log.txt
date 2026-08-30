@@ -11,10 +11,10 @@ Templates discovered: 4
 Generator context source: Python AST ContextExtractor only.
   -> call to 'Flask(...)' is outside the resolver's whitelist; treated as unresolved.
 UNRESOLVED  app (line 6): right-hand side is not a literal and could not be reduced by the whitelisted-builtin resolver.
-RESOLVED    UPLOAD_FOLDER = static/uploads (line 11)
-RESOLVED    DATA_FILE = products.json (line 12)
-RESOLVED    products = [{id=1, name=Burger, price=2145121.0, details=cheese burger, image=double-che... (line 34)
-RESOLVED    next_id = 5 (line 37)
+RESOLVED    UPLOAD_FOLDER = static/uploads (line 9)
+RESOLVED    DATA_FILE = products.json (line 10)
+RESOLVED    products = [{id=1, name=Burger, price=2145121.0, details=cheese burger, image=double-che... (line 28)
+RESOLVED    next_id = 5 (line 31)
 
 === HTML generation ===
 Fan-out: generated detail_1.html from products where id=1.

@@ -273,7 +273,6 @@ public class HtmlGenerator {
         try {
             return Double.parseDouble(trimmed);
         } catch (NumberFormatException ignored) {
-            // fall through to variable lookup
         }
         return resolveDotted(trimmed, scope);
     }
@@ -287,11 +286,7 @@ public class HtmlGenerator {
             String key = parts[i];
             if (m.containsKey(key)) {
                 current = m.get(key);
-            } else if ("description".equals(key) && m.containsKey("details")) {
-                current = m.get("details");
-            } else if ("details".equals(key) && m.containsKey("description")) {
-                current = m.get("description");
-            } else {
+            }  else {
                 return UNRESOLVED;
             }
         }
@@ -323,11 +318,10 @@ public class HtmlGenerator {
             StringBuilder selectorsOut = new StringBuilder();
             for (int i = 0; i < sels.size(); i++) {
                 if (i == 0) {
-                    // first selector, nothing to prefix
                 } else if (rule.isCommaBefore(i)) {
                     selectorsOut.append(", ");
                 } else {
-                    selectorsOut.append(" "); // descendant combinator, e.g. "nav a"
+                    selectorsOut.append(" ");
                 }
                 selectorsOut.append(renderSelector(sels.get(i)));
             }
@@ -388,7 +382,7 @@ public class HtmlGenerator {
             String y = tr.getY() != null ? formatCssNumber(tr.getY()) + (tr.getUnitY() != null ? tr.getUnitY() : "") : "";
             return "translate(" + x + (tr.isFull() ? ", " + y : "") + ")";
         }
-        if (term instanceof CSSFunction) return ""; // unrecognized function subtype
+        if (term instanceof CSSFunction) return "";
         return "";
     }
 }
