@@ -119,7 +119,7 @@ public class JinjaSemanticChecker implements ASTVisitorJinja<Void> {
         }
 
         error(line, "Template variable '" + baseName + "' is not defined - it wasn't passed in from "
-                + "the Python side (render_template(...)) and isn't a loop variable or {% set %} variable "
+                + "the Python side (render_template(...)) and isn't a loop variable "
                 + "in this template.");
     }
 

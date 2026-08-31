@@ -78,7 +78,7 @@ public final class ProductStore {
         product.put("id", nextId);
         product.put("name", name);
         product.put("price", price);
-        product.put("description", description);
+        product.put("details", description);
         product.put("image", image);
         products.add(product);
         persist();

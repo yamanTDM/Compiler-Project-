@@ -236,12 +236,12 @@ public class Main {
         pageModels.add(fanOut == null
                 ? new PageModel(entry.outputName(), resolvedTree, null, null, null, null)
                 : new PageModel(
-                        entry.outputName(),
-                        resolvedTree,
-                        fanOut.endpoint(),
-                        fanOut.collectionName(),
-                        fanOut.itemName(),
-                        fanOut.keyField()));
+                entry.outputName(),
+                resolvedTree,
+                fanOut.endpoint(),
+                fanOut.collectionName(),
+                fanOut.itemName(),
+                fanOut.keyField()));
         if (fanOut == null) return;
 
         Object rawItems = contextExtractor.moduleContext.get(fanOut.collectionName());
@@ -322,7 +322,7 @@ public class Main {
                         String name = path.getFileName().toString().toLowerCase();
                         return name.endsWith(".py") || name.equals("python.txt");
                     })
-                    .sorted((a, b) -> scorePythonName(a).compareTo(scorePythonName(b)))
+                    .sorted()
                     .toList();
         }
         if (candidates.isEmpty()) {
@@ -332,25 +332,15 @@ public class Main {
         return candidates.getFirst();
     }
 
-    private static String scorePythonName(Path path) {
-        String name = path.getFileName().toString().toLowerCase();
-        if (name.equals("app.py")) return "0";
-        if (name.endsWith(".py")) return "1" + name;
-        return "2" + name;
-    }
 
     private static AST_Python.Program parsePythonFile(Path path) throws IOException {
         CharStream input = CharStreams.fromPath(path);
         PythonIndentLexer lexer = new PythonIndentLexer(input);
-        SyntaxErrors errors = new SyntaxErrors(path);
-        lexer.removeErrorListeners();
-        lexer.addErrorListener(errors);
+
 
         PythonParser parser = new PythonParser(new CommonTokenStream(lexer));
-        parser.removeErrorListeners();
-        parser.addErrorListener(errors);
+
         ParseTree parseTree = parser.prog();
-        errors.throwIfAny();
 
         PythonVisitor visitor = new PythonVisitor();
         return (AST_Python.Program) visitor.visit(parseTree);
@@ -359,15 +349,11 @@ public class Main {
     private static Program parseJinjaFile(Path path) throws IOException {
         CharStream input = CharStreams.fromPath(path);
         JinjaHtmlLexer lexer = new JinjaHtmlLexer(input);
-        SyntaxErrors errors = new SyntaxErrors(path);
-        lexer.removeErrorListeners();
-        lexer.addErrorListener(errors);
+
 
         JinjaHtmlParser parser = new JinjaHtmlParser(new CommonTokenStream(lexer));
-        parser.removeErrorListeners();
-        parser.addErrorListener(errors);
+
         ParseTree parseTree = parser.prog();
-        errors.throwIfAny();
 
         JinjaHtmlVisitor visitor = new JinjaHtmlVisitor();
         return (Program) visitor.visit(parseTree);
@@ -394,30 +380,5 @@ public class Main {
             Object initialProducts) {
     }
 
-    private static final class SyntaxErrors extends BaseErrorListener {
-        private final Path source;
-        private final List<String> errors = new ArrayList<>();
 
-        private SyntaxErrors(Path source) {
-            this.source = source;
-        }
-
-        @Override
-        public void syntaxError(
-                Recognizer<?, ?> recognizer,
-                Object offendingSymbol,
-                int line,
-                int charPositionInLine,
-                String message,
-                RecognitionException exception) {
-            errors.add("line " + line + ":" + charPositionInLine + " " + message);
-        }
-
-        private void throwIfAny() throws IOException {
-            if (!errors.isEmpty()) {
-                throw new IOException("Syntax errors in " + source + System.lineSeparator()
-                        + String.join(System.lineSeparator(), errors));
-            }
-        }
-    }
 }

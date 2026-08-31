@@ -36,8 +36,6 @@ index.html
 errors
 products.json
 python.py
-static/uploads/914648_3f79eee8a5b3466bb4feb38453c9c9c3mv2.png
-static/uploads/ab67616d00001e0296fa88fb1789be437d5cb4b6.jpg
 static/uploads/double-cheeseburger-ss-NEW.png
 static/uploads/EXPS_TOHD24_167133_SarahTramonte_6.jpg
 static/uploads/french_fries.png

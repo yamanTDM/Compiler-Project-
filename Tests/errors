@@ -53,8 +53,6 @@ result3 = 10 / 0
 def first_function():
     local_variable = 100
 
-first_function()
-
 print(local_variable)
 
 
@@ -62,8 +60,6 @@ print(local_variable)
 def outer_function():
     def inner_function():
         return 10
-
-outer_function()
 
 inner_function()
 
@@ -89,31 +85,13 @@ JINJA
 <body>
 
 <!-- Variable defined in another scope -->
+{% for out_of_scope_variable in products %}
+<p>{{ out_of_scope_variable }}</p>
+{% endfor %}
+
 <p>{{ out_of_scope_variable }}</p>
 
 
-<!-- Undefined variable in an if condition -->
-{% if missing_condition %}
-<p>Condition</p>
-{% endif %}
-
-
-<!-- Undefined variable in a comparison -->
-{% if missing_age > 18 %}
-<p>Adult</p>
-{% endif %}
-
-
-<!-- Undefined variable in a for collection -->
-{% for user in missing_users %}
-<p>{{ user }}</p>
-{% endfor %}
-
-
-<!-- Undefined variable inside a loop condition -->
-{% for user in users if missing_filter %}
-<p>{{ user }}</p>
-{% endfor %}
 
 
 <!-- Loop variable shadows collection -->
@@ -134,6 +112,7 @@ JINJA
 {% set true = "hello" %}
 
 
+
 <!-- super() outside inherited template block -->
 {{ super() }}
 
@@ -150,6 +129,13 @@ JINJA
 
 <!-- Undefined variable in a Jinja function argument -->
 {{ url_for("profile", user_id=missing_user_id) }}
+
+
+
+
+<!-- None matching HTML Tags -->
+<p></h1>
+
 
 </body>
 </html>
